@@ -1,0 +1,281 @@
+﻿
+@color: #91caf1;
+@border: thin #336699 solid;
+@padding: 10px;
+@margin: 5px;
+@text-align: center;
+@header-font: Arial;
+
+
+
+html {
+	min-height: 100%;
+	font-family: sans-serif;
+    .mdisplayflex;
+	.mdirectionColumn;
+}
+
+body {
+	margin: 0;
+	padding: @padding;
+	.mdisplayflex();
+	.mdirectionColumn();
+	.mflex(auto);
+}
+
+.Content {
+    /*width: 100%;*/
+	/*max-width: 960px;*/
+	/*min-width: 1024px;*/
+	margin: auto;
+	
+    .mflex(1);
+
+	/*box-sizing: border-box;*/
+    text-align: @text-align;
+}
+
+/*Примеси Начало*/
+/*Включение Flexbox*/
+    .mdisplayflex(){
+        display:-webkit-box;
+        display:-moz-box;
+        display:-ms-flexbox;
+        display:-webkit-flex;
+        display:flex;
+    }
+
+    /*Прямая колонка*/
+    .mdirectionColumn() { 
+        -webkit-box-orient:vertical;
+        -moz-box-orient:vertical;
+        -ms-flex-direction:column;
+        -webkit-flex-direction:column;
+        flex-direction:column; 
+    }
+    /*Растягивание блоков*/
+    .mflex(@value) {
+        -webkit-box-flex:@value;
+        -moz-box-flex:@value;
+        -ms-flex:@value;
+        -webkit-flex:@value;
+        flex:@value;
+    }
+/*Примеси Конец*/
+
+
+.Header {
+    /*width: 100%;*/
+	padding: @padding;
+    
+    /*max-width: 960px;
+	min-width: 1024px;
+	margin: 0 auto 30px;
+	
+	display: -webkit-flex;
+	display: flex;
+
+	justify-content: space-between;
+	box-sizing: border-box;*/
+
+    background-color: @color;
+    border: @border;
+    text-align: @text-align;
+    font-family: @header-font;
+
+    a {
+        text-decoration:none;/* Отменяем подчеркивание у ссылки */
+        color: black;
+    } 
+
+    .Logof {
+        text-align: right;
+        vertical-align:bottom;
+        font-size:small;
+        a {
+            text-decoration:underline;
+        } 
+    } 
+}
+
+
+
+.Footer {
+    background-color: @color + 55;
+    width: 100%;
+	/*max-width: 960px;*/
+	/*min-width: 1024px;*/
+    text-align: @text-align;
+    /*font-family: @header-font;*/
+    font-size: x-small;   
+    margin: auto;
+	padding: @padding;
+	box-sizing: border-box;
+}
+
+.exceptionMsg{
+    color: red;
+    text-align:left;
+    }
+
+textarea {
+  outline: none; //Убираем обводку вокруг textarea
+  resize: none; //Убираем уголок ресайза. В Google Chrome
+  overflow: auto; // Убираем полосы прокрутки в Internet Explorer
+  //<textarea wrap="off"></textarea>
+}
+/*//Чередование цвета строк
+tr:nth-of-type(even) {
+	background-color: #DCC;
+}
+tr:nth-of-type(odd) {
+	background-color: #F3F3F3;
+}*/
+
+/*fieldset {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 0;
+}*/
+
+/*legend {
+  padding: 0px 3px;
+  font-weight: bold;
+  font-variant: small-caps;
+}*/
+
+label {
+  width: 190px;
+  display: inline-block;
+  /*vertical-align: top;*/
+  text-align:right;
+  margin: 6px;
+}
+
+em {
+  font-weight: bold;
+  font-style: normal;
+  color: #f00;
+}
+
+/* Styles for validation helpers
+-----------------------------------------------------------*/
+.field-validation-error {
+    color: red;
+    font-weight:bold;
+    text-decoration:underline;
+
+    /*text-align: left;
+    width: 290px;
+    display: inline-block;*/
+}
+ 
+.input-validation-error {
+    border: 1px solid #006699;
+    background-color: silver;
+}
+ 
+.field-validation-valid {
+    display: none;
+    background-color: green;
+}
+ 
+.validation-summary-errors {
+    font-weight: bold;
+    color: #f00;
+}
+ 
+.validation-summary-valid {
+    display: none;
+}
+
+errormsg{
+    text-align: left;
+    width: 290px;
+    width: 100%;
+}
+
+
+
+input:focus {
+  background: #eaeaea;
+}
+
+/*select {
+  width: 254px;
+  color: #99BF21;
+}*/
+
+input[type=checkbox] {
+  width: 10px;
+}
+
+button,
+input[type=submit] {
+  /*width: 100px;*/
+  padding: 10px;
+  background: -webkit-linear-gradient(top, white, black);
+  border-radius: 5px;
+}
+
+
+.webgrid
+{
+        &-table {
+        /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        font-size: 1.2em;
+        width: 100%;*/
+        display: table;
+        border-collapse: separate;
+        /*border: solid 1px #98BF21;*/
+        background-color: white;
+    }
+
+    &-header {
+        background-color: #A7C942;
+        /*color: #FFFFFF;
+        padding-bottom: 4px;
+        padding-top: 5px;*/
+        margin: 10px;
+        text-align: center;
+    }
+
+    &-row-style {
+        /*padding: 3px 7px 2px;*/
+        background-color: #EAF2D3 + 22;
+    }
+
+    &-alternating-row {
+        background-color: #EAF2D3;
+        /*padding: 3px 7px 2px;*/
+    }
+
+    &-clientnumber {
+        width: 80px;
+    }
+
+    &-footer {
+        text-align: right;
+        /*vertical-align:bottom;*/
+    }
+}
+
+.highlight {
+    background: yellow;
+}
+
+
+
+/*text/javascript{
+    font-size: large;
+}*/
+
+@alert-primary-bg: white;
+@alert-primary-border: white;
+@alert-primary-text: black; 
+
+.alert {
+    background-color: @alert-primary-bg;
+    border-color: @alert-primary-border;
+    color: @alert-primary-text;
+}

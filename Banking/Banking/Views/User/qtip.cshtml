@@ -1,0 +1,239 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!--стиль для ошибок-->
+<style>
+    input.error,
+    textarea.error,
+    select.error,
+    div.error {
+        border: 1px solid red !important;
+    }
+
+    input[type='text'].error {
+        border: 1px solid #e1e1e1;
+        border-top: 1px solid #b0aa9b;
+        border-left: 1px solid #b0aa9b;
+        background: #ff9582;
+    }
+</style>
+
+<script type="text/javascript" language="javascript">
+	$(document).ready(function() {
+
+              //настрйока валидации
+	$("#register_form").validate({
+		ignore: ".ignore, :hidden",
+		focusInvalid: true,
+		hideErrElem : "#validate_error",
+		errorPlacement: function(error,element) {
+			//назначаем обработчик на ошибки
+			changeTip(element);
+			return true;
+		},
+
+		rules: {
+			'users_login'		: {
+				required : true,
+				login: true
+			},
+			'users_password'		: {
+				required : true,
+				pass: true,
+				minlength: 6
+			}
+		}
+	});
+	$("#subm_id").click(function() {
+		var valid = $("#register_form").valid();
+		if(valid)
+		{
+			document.forms["form_reg"].submit()
+	    }
+	});
+
+	jQuery.validator.addMethod('login', function(value, element, param)
+	{
+		if((new RegExp("^[0-9a-zA-Z\_]{3,}$", "").test(value)))
+		{
+			return true;
+		}
+
+		return false;
+	});
+
+	jQuery.validator.addMethod("pass", function(value, element)
+	{
+		if((/^[a-zA-Z\d\-\!\.\/\$\\\,\?\:\&\*\;\@@\%\(\)\+\=\№\#\_\[\]]{6,}$/.test(value)))
+		{
+			return true;
+		}
+
+		return false;
+	});
+
+	//для того чтобы выводить ошибки при валидации обернем все подсказки в объект, чтобы было удобнее ими управлять
+	fields_tip = {
+		//основные параметры для подсказок
+		tip_w : 300,
+		tip_r : 3,
+		tip_color : 'light',
+		tip_show : 'mouseover focus',
+		tip_show_ready : false,
+		tip_hide : 'mouseout click blur',
+		tip_border_w : 0,
+		tip_screen : false,
+		tip_hide_delay : 0,
+
+		//настройка внешнего вида подсказок qtip
+
+		//поле логин
+		users_login : function() {
+			$('*[name="users_login"]').qtip({
+				content: {
+					text: 'Для поля "Логин" допускается ввод чисел от 0 до 9, а также букв латинского алфавита и символа "_"',
+					title: {
+						text: 'Логин'
+					}
+				},
+				position: {
+					corner: {
+						target: 'rightMiddle',
+						tooltip: 'leftMiddle'
+					},
+					adjust: {
+						screen: this.tip_screen
+					}
+				},
+				show: {
+					when: this.tip_show,
+					solo: false,
+					ready : this.tip_show_ready
+				},
+				hide: {
+					when: {
+						event: this.tip_hide
+					},
+					delay: this.tip_hide_delay
+				},
+				style: {
+					tip: true,
+					border: {
+						width: this.tip_border_w,
+						radius: this.tip_r
+					},
+					name: this.tip_color,
+					width: this.tip_w
+				}
+			});
+		},
+		users_login_destruct : function() {
+			$('*[name="users_login"]').qtip('destroy');
+		},
+		//поле пароль
+		users_password : function() {
+			$('*[name="users_password"]').qtip({
+				content: {
+					text: 'Для поля "Пароль" допускается ввод чисел от 0 до 9, а также букв латинского алфавита и символов "-!./\$,?:&*;@@%()+=№#_[]"',
+					title: {
+						text: 'Пароль'
+					}
+				},
+				position: {
+					corner: {
+						target: 'rightMiddle',
+						tooltip: 'leftMiddle'
+					},
+					adjust: {
+						screen: this.tip_screen
+					}
+				},
+				show: {
+					when: this.tip_show,
+					solo: false,
+					ready : this.tip_show_ready
+				},
+				hide: {
+					when: {
+						event: this.tip_hide
+					},
+					delay: this.tip_hide_delay
+				},
+				style: {
+					tip: true,
+					border: {
+						width: this.tip_border_w,
+						radius: this.tip_r
+					},
+					name: this.tip_color,
+					width: this.tip_w
+				}
+			});
+		},
+		users_password_destruct : function() {
+			$('*[name="users_password"]').qtip('destroy');
+		},
+		//инициализация подсказок
+		init : function() {
+			this.users_login();
+			$('*[name="users_login"]').mouseover();
+			this.users_password();
+			$('*[name="users_password"]').mouseover();
+		},
+
+		destructor : function() {
+			this.users_login_destruct();
+			this.users_password_destruct();
+		}
+
+	};
+
+	fields_tip.init();
+});
+
+function changeTip(element)
+{
+
+	if(!($(element).hasClass('error')))
+	{
+		//если класса ошибки у элемента нет, то делаем ему нормальную подсказку
+		//удаляем ту, что есть
+		$(element).qtip('destroy');
+		//создаем обычную
+		fields_tip.tip_r = 3;
+		fields_tip.tip_border_w = 3;
+		fields_tip.tip_show_ready = false;
+		fields_tip.tip_color = 'light';
+		fields_tip.tip_show = 'mouseover focus';
+		fields_tip.tip_hide = 'mouseout click blur';
+		fields_tip[$(element)[0].name].call(fields_tip);
+		$('*[name="' + $(element)[0].name + '"]').mouseover();
+	}
+	else
+	{
+		//удаляем ту, что есть
+		$(element).qtip('destroy');
+
+		fields_tip.tip_color = 'red';
+		fields_tip.tip_show_ready = true;
+		fields_tip.tip_show = 'mouseover focus';
+		fields_tip.tip_hide = 'click mouseout blur';
+
+		//создаем ошибку
+		fields_tip[$(element)[0].name].call(fields_tip);
+		$('*[name="' + $(element)[0].name + '"]').mouseover();
+        //скрытие подсказки, можно сделать любой эффект
+		setTimeout('$(\'*[name="' + $(element)[0].name + '"]\').qtip("hide");', 3000);
+	}
+}
+
+</script>
+
+
+<form action="" method="post" id="register_form" name="form_reg">
+    Логин: <input title="" name="users_login" type="text" /></br>
+    Пароль: <input name="users_password" type="password" /></br>
+    <input name="submit_f" id="subm_id" type="button" value="Submit" />
+</form>

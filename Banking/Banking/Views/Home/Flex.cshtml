@@ -1,0 +1,110 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Flex</title>
+<style>
+    html {
+    background: #ccc;
+    min-height: 100%;
+    font-family: sans-serif;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    }
+    body {
+    margin: 0;
+    padding: 0 15px;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+    }
+    .header {
+    width: 100%;
+    margin: 0 auto 30px;
+    padding: 30px 0 10px;
+    display: -webkit-flex;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    box-sizing: border-box;
+    }
+    .content {
+    width: 100%;
+    margin: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    }
+    .footer {
+    background: #222;
+    width: 100%;
+    color: #eee;
+    margin: auto;
+    padding: 15px;
+    box-sizing: border-box;
+    }
+
+     /*.green{ background: green; }
+    .red{ background: red; }
+    .blue{ background: blue; }   
+    class="green"  
+    class="red"    
+    class="blue"*/   
+
+    /*.poem {
+    display:inline-flexbox;
+    display: -webkit-flex;
+    flex-direction:column;  
+    }*/
+
+    /*.poem div {
+     display:inline-flexbox;
+     flex:auto;
+    }
+
+.header {
+    background:red;
+    /*height:250px;*/
+   justify-content: center;
+   align-content:center;
+
+    }
+.footer {
+    background:blue;
+    /*flex-grow:2;*/
+    justify-content: center;
+    }
+
+.content {
+    background:green;
+        flex-grow:1;
+        
+        /*display:flex;
+    flex-direction:row;  
+
+    justify-content:space-around;*/
+    }*/
+
+</style>
+</head>
+<body>
+    <p>@Html.ActionLink("Return", "Index")</p>
+    <div class="poem">
+        <div class="header">1 header</div>
+        <div class="content">
+            <div>1 content <br>1 content</div>
+            <div>2 content <br>2 content</div>
+            <div>3 content <br />3 content</div>
+
+        </div>
+        <div class="footer">3 footer</div>
+    </div>
+</body>
+</html>

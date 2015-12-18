@@ -1,0 +1,19 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+
+@{
+    ViewBag.Title = "Error";
+}
+
+<div class="exceptionMsg">
+    <h3>
+        Sorry, an error occurred while processing your request.
+    </h3>
+    <h4>@Model.Exception.Message</h4>
+</div>
+
+<button onclick="Error_goBack()" class="btn">Go Back</button>
+<script>
+    function Error_goBack() {
+        window.history.back()
+    }
+</script>

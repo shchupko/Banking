@@ -1,0 +1,15 @@
+﻿
+@using Banking.Domain
+@model IEnumerable<Client>
+
+<div id="searchresults">
+
+    <h3>Found : @Model.Count()</h3>
+    <ul>
+        @foreach (var item in Model)
+        {
+            <li>@item.Lastname</li>
+        }
+    </ul>
+
+</div>

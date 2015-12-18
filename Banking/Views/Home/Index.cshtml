@@ -1,0 +1,71 @@
+﻿
+@using Banking.Controllers
+@model Banking.Controllers.HomeController
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    @{
+        var dataFile = Server.MapPath("~/Content/Requirements.txt");
+        Array userData = File.ReadAllLines(dataFile);
+    }
+</head>
+<body>
+    <div>
+        <p>This is test task.</p>
+        <noscript>
+            
+                Please enable JavaScript in your web browser!
+            </h2>
+        </noscript>
+
+        <p>@Html.ActionLink("Enter", "List", "Client") &nbsp; &nbsp; &nbsp; 
+        @Html.ActionLink("Throw Exception", "ThrowException") &nbsp; &nbsp; &nbsp; 
+        @Html.ActionLink("Qtip login example", "qtip", "User") &nbsp; &nbsp; &nbsp;
+        @Html.ActionLink("Flex  example", "Flex") &nbsp; &nbsp; &nbsp;
+
+        <div id="bestbook">
+            @Ajax.ActionLink("Ajax Flex example", "Flex", new AjaxOptions { UpdateTargetId = "bestbook" })
+        </div>
+
+        @*<button onclick="(ThrowException)" class="btn">Throw Exception</button>
+        <script>
+            function ThrowException() {
+                throw new HttpException(403, "Доступ запрещён!");
+            }
+        </script>*@
+    </div>
+    <div>
+        @*<fieldset>
+            @foreach (string dataLine in userData)
+            {
+                foreach (string dataItem in dataLine.Split(','))
+                {  @dataItem  }
+                        <br />
+
+            }
+        </fieldset>*@
+        @Html.TextAreaFor(model => model.FileText, new { Output})
+        @*@ShowTextFile( Model.FileText)*@
+        @*@ListHelper.CreateList(Html, model => model.FileText)*@
+    </div>
+
+
+    @helper ShowTextFile(string text)
+    {
+        <ul>
+            @*@items = text.Split('\n');
+            foreach (string s in items)
+            {
+            <li>@s</li>
+            }*@
+        </ul>
+    }
+</body>
+</html>

@@ -1,0 +1,44 @@
+﻿@model Banking.Domain.Models.ViewModels.UserRegisterView
+
+@{
+  //  ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Register", "User", FormMethod.Post))
+{
+    <h4>Please type next data:</h4>    
+    @*@Html.ValidationSummary()*@
+    <div>
+        <label for="Login">Login<em>*</em></label>
+        @Html.TextBox("Login", Model.Login, new { required = "required", placeholder = "John" })
+
+        <errormsg>
+            @Html.ValidationMessage("Login")
+        </errormsg><br>
+
+        <label for="Password">Password<em>*</em></label>
+        @Html.TextBox("Password", Model.Login, new { required = "required", type = "password", MinLengthAttributeAdapter = 3, MaxLengthAttributeAdapter = 16 })
+        <errormsg> @Html.ValidationMessage("Password") </errormsg><br>
+
+        <label for="ConfirmPassword">Confirm Password<em>*</em></label>
+        @Html.TextBox("ConfirmPassword", Model.Login, new { required = "required", type = "password" })
+        @Html.ValidationMessage("ConfirmPassword")<br>
+
+        <label for="Email">Email<em>*</em></label>
+        @Html.TextBox("Email", Model.Email, new { required = "required", type = "email" })
+        @Html.ValidationMessage("Email")<br>
+
+        <label for="Address">Address</label>
+        @Html.TextBox("Address", Model.Address)
+        @Html.ValidationMessage("Address")<br>
+
+        <img src="@Url.Action("Captcha", "User")" alt="captcha" /><br>
+        <label for="Captcha">Captcha<em>*</em></label>
+        @Html.TextBox("Captcha", Model.Captcha, new { type = "number", placeholder = "Enter picture text" })
+        @Html.ValidationMessage("Captcha")<br>
+
+        <input type="submit" value="Register" class="btn" />
+        @Html.ActionLink("Cancel", "Login", null, null, new { @class = "btn" })
+</div>
+}

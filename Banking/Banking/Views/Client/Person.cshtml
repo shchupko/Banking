@@ -1,0 +1,57 @@
+﻿
+@using Banking.Domain
+@model Client
+
+@{
+    ViewBag.Title = "Person";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <title>Person</title>
+</head>
+
+@using (Html.BeginForm("Person", "Client", FormMethod.Post))
+{
+    @Html.ValidationSummary()
+    <fieldset>
+        <legend>Please type next data</legend>
+        @Html.HiddenFor(x => x.ContactNumber)
+
+        <label for="Firstname">Firstname<em>*</em></label>
+        @Html.TextBox("Firstname", Model.Firstname, new { required = "required" })
+        @Html.ValidationMessage("Firstname")<br>
+
+        <label for="Lastname">Lastname</label>
+        @Html.TextBox("Lastname", Model.Lastname, new { MaxLengthAttributeAdapter = "20" })
+        @Html.ValidationMessage("Lastname")<br>
+
+        <label for="Birsday">Date of Birth<em>*</em></label>
+        @Html.TextBox("Birsday", Model.Birsday, new { required = "required", type = "date", value="2015-10-01", min = "1915-01-01", max = "2015-01-01" })
+        @Html.ValidationMessage("Birsday")<br>
+
+        <label for="Phone">Phone Number<em>*</em></label>
+        @Html.TextBox("Phone", Model.Phone, new { required = "required", type = "tel" })
+        @Html.ValidationMessage("Phone")<br>
+
+        <label for="Status">Status</label>
+        <datalist id="dl_status">
+            <span class="Label">Choise from list:</span>
+            <select id="favoriteFruite">
+                <option label="Classic" value="Classic"></option>
+                <option label="VIP" value="VIP"></option>
+            </select>
+            <br>
+            <span class="Label">Or enter manual:</span>
+        </datalist>
+        @*<input id="Status" list="dl_status"><br>*@
+        @Html.TextBox("Status", Model.Status, new { list="dl_status"})
+        @Html.ValidationMessage("Status")<br>
+
+        <label for="Deposit">Deposit</label>
+        @Html.CheckBox("Deposit", Model.Depo)<br>
+
+        <input type="submit" value="Save" class="btn" />
+        @Html.ActionLink("Cancel", "List", null, null, new { @class = "btn" })
+    </fieldset>
+}

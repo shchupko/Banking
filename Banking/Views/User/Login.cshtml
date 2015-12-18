@@ -1,0 +1,28 @@
+﻿@model Banking.Domain.Models.ViewModels.UserLoginView
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    <h4>Please enter your credentials:</h4>
+    <div>
+        @Html.ValidationSummary()
+        <label for="Login">Login</label>
+        @Html.TextBoxFor(x => x.Login, "Login", new { required = "required", placeholder = "John" })
+        <br>
+        <label for="Password">Password</label>
+        @Html.TextBoxFor(x => x.Password, "Password", new { required = "required", type = "password", MinLengthAttributeAdapter = 3, MaxLengthAttributeAdapter = 16 })
+        <br>
+
+        <p>
+            @Html.CheckBox("RememberMe", true)Remember me
+        </p>
+
+        <input type="submit" value="Submit" class="btn" />
+      
+    @Html.ActionLink("Register new account", "Register")
+    </div>
+}
+

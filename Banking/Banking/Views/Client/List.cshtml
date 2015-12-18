@@ -1,0 +1,181 @@
+﻿@using System.Web.UI.WebControls
+@using Banking.Domain
+@model IEnumerable<Client>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <title>List</title>
+</head>
+
+
+
+<body>
+<div>
+    @using (Ajax.BeginForm("PersonSearch", new AjaxOptions
+    {
+        UpdateTargetId = "results",
+        Confirm = "Выполнить AJAX-запрос?",
+        LoadingElementId = "loading",
+        LoadingElementDuration = 1000,
+        OnBegin = "OnBegin",
+        OnFailure = "OnFailure",
+        OnSuccess = "OnSuccess",
+        OnComplete = "OnComplete"
+    }))
+    {
+        <input type="text" name="name" />
+        <input type="submit" value="PersonSearch" />
+    }
+    @*<img id="loading" src="@Url.Content("~/Content/BankingLogo.png")" style="display:none" />*@
+    <div id="loading" style="display:none; color:Red; font-weight:bold;">
+            <p>Идет загрузка...</p>
+        </div>
+    <div id="results"></div>
+</div>
+<div>
+    <script type="text/javascript">
+        function OnSuccess2(data) {
+            var results = $('#results2'); // получаем нужный элемент
+            results.empty(); //очищаем элемент
+            for (var i = 0; i < data.length; i++) {
+                console.log(data[i].Name);
+                results.append('<li>' + data[i].Name + '</li>'); // добавляем данные в список
+            }
+        }
+    </script>
+
+    @using (Ajax.BeginForm("JsonSearch", new AjaxOptions {OnSuccess = "OnSuccess2"}))
+    {
+        <input type="text" name="name"/>
+        <input type="submit" value="JsonSearch" />
+    }
+    <br/>
+    <div id="results2"></div>
+</div>
+
+@using (Html.BeginForm("List", "Client", FormMethod.Post))
+{
+    <div id="grid">
+    @{
+        var grid = new WebGrid(Model, defaultSort: "ContactNumber", selectionFieldName: "SelectedRow", rowsPerPage: 6, ajaxUpdateContainerId: "grid");
+
+        @grid.GetHtml(
+        tableStyle: "webgrid-table",
+        headerStyle: "webgrid-header",
+        footerStyle: "webgrid-footer",
+        alternatingRowStyle: "webgrid-alternating-row",
+        selectedRowStyle: "webgrid-selected-row",
+        rowStyle: "webgrid-row-style",
+        mode: WebGridPagerModes.All,
+
+        columns: grid.Columns(
+            grid.Column(format: @<text>
+                <button name="action" value=@string.Format("Edit={0}", @item.ContactNumber)>Edit</button>
+                <button name="action" value=@string.Format("Delete={0}", @item.ContactNumber)
+                        onclick="javascript:return ConfirmDelete(@item.ContactNumber);">
+                    Delete
+                </button>
+            </text>),
+            @*grid.Column(format: @<text>@Html.ActionLink(item.ContactNumber, "Delete", "DeleteAction", new { id = item.ContactNumber }, null)</text>),*@
+
+            grid.Column(columnName: "ContactNumber", header: "Client Contract Number",
+                @*format: @<text>@item.GetSelectLink(@item.ContactNumber.ToString("000000"))</text>),*@
+                format: @<text>@item.ContactNumber.ToString("000000")</text>),
+
+            grid.Column(columnName: "Firstname", header: "First name", canSort: true),
+            grid.Column(columnName: "Lastname", header: "Last name"),
+            grid.Column(columnName: "Birsday", header: "Birsday", format: a => (a.Birsday.ToString("D"))),
+            grid.Column(columnName: "Phone", header: "Phone number", format: @<text>@item.Phone</text>),
+            grid.Column(columnName: "Status", header: "Status"),
+            grid.Column(columnName: "Depo", header: "Deposit",
+                format: (item) => Html.CheckBox("depo", @item.depo == null ? false : item.depo ? true : false))
+        ) // columns: grid.Columns(
+        ) //@grid.GetHtml(
+    }
+    @*@if (grid.HasSelection)  { @Html.Action("Person", "Client", new { Client = grid.SelectedRow});   }*@
+    </div>
+
+    <div class="webgrid-footer">
+        <button name="action" value="New">Create New Client</button>
+
+        @if (ViewBag.TotalCount != null)
+        {
+            <button name="action" value="Vip">Show Only Vip</button>
+            @:Total count of clients: @ViewBag.TotalCount
+    }
+        else
+        {
+            <button name="action" value="ShowAll">Show All</button>
+        }
+
+        Count of VIP clients: @ViewBag.VipCount
+        Clients who did Deposit: @ViewBag.DepoCount
+    </div>
+}
+
+    <script type="text/javascript">
+    function OnBegin() {
+        alert("Происходит отправка запроса");
+    }
+
+    function OnSuccess(data) {
+        alert("Запрос был успешно выполнен. Получены следующие данные: \n" + data);
+    }
+
+    function OnFailure(request, error) {
+        $("#results").html("Книги указанного автора не содержатся в базе данных.");
+    }
+
+    function OnComplete(request, status) {
+        alert("Статус запроса : " + status);
+    }
+
+
+    function ConfirmDelete(id) {
+        return confirm("Are you sure you want to delete client " + id + " ?");
+    }
+
+    $("tr").click(function () {
+        $(".highlight").not(this).toggleClass("highlight");
+        $(this).toggleClass("highlight");
+        //var rowId = $(event.target).parent("tr").attr("ContactNumber");
+        //console.log(rowId);
+    });
+
+    $("tr").dblclick(function () {
+        console.log($(this).text());
+        var id = $(this).find("td:nth-child(2)").text();
+        $.get("?Edit=" + id);
+    });
+
+    // make highlight after Search ???
+    $(document).ready(function () {
+        var searchList = '@ViewBag.SearchList';
+        $("#grid tbody tr").each(function (i, row) {
+            var $actualRow = $(row);
+            var id = $actualRow.find("td:nth-child(2)").text();
+            console.log(id);
+            //if ($actualRow.find('input[type=checkbox]').prop('checked') == true) {
+            //    $actualRow.toggleClass("highlight");
+            //}
+
+            if (id%2) {
+                $actualRow.toggleClass("highlight");
+            }
+        });
+    });
+
+    // Add footer ???
+    $(document).ready(function () {
+        var html = $('.webgrid-footer');
+        $('#grid').append(html);
+    });
+
+</script>
+
+
+
+</body>
