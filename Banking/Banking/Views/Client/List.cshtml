@@ -1,6 +1,9 @@
-﻿@using System.Web.UI.WebControls
+﻿@*@using System.Web.UI.WebControls*@
+@using System.IdentityModel.Claims
+@using System.Web.UI.WebControls
 @using Banking.Domain
-@model IEnumerable<Client>
+@*@model IEnumerable<Client>*@
+@model Banking.Controllers.PagedClientsModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -13,7 +16,25 @@
 
 
 <body>
-<div>
+<div style="text-align:right;">
+    <script type="text/javascript">
+        function OnBegin() {
+            alert("Происходит отправка запроса");
+        }
+
+        function OnSuccess(data) {
+            alert("Запрос был успешно выполнен. Получены следующие данные: \n" + data);
+        }
+
+        function OnFailure(request, error) {
+            $("#results").html("Книги указанного автора не содержатся в базе данных.");
+        }
+
+        function OnComplete(request, status) {
+            alert("Статус запроса : " + status);
+        }
+    </script>
+
     @using (Ajax.BeginForm("PersonSearch", new AjaxOptions
     {
         UpdateTargetId = "results",
@@ -25,17 +46,17 @@
         OnSuccess = "OnSuccess",
         OnComplete = "OnComplete"
     }))
-    {
-        <input type="text" name="name" />
-        <input type="submit" value="PersonSearch" />
-    }
-    @*<img id="loading" src="@Url.Content("~/Content/BankingLogo.png")" style="display:none" />*@
-    <div id="loading" style="display:none; color:Red; font-weight:bold;">
+        {
+            <input type="text" name="name" />
+            <input type="submit" value="First name Search" />
+        }
+        @*<img id="loading" src="@Url.Content("~/Content/BankingLogo.png")" style="display:none" />*@
+        <div id="loading" style="display: none; color: Red; font-weight: bold;">
             <p>Идет загрузка...</p>
         </div>
-    <div id="results"></div>
-</div>
-<div>
+        <div id="results"></div>
+    </div>
+@*<div>
     <script type="text/javascript">
         function OnSuccess2(data) {
             var results = $('#results2'); // получаем нужный элемент
@@ -54,13 +75,16 @@
     }
     <br/>
     <div id="results2"></div>
-</div>
+</div>*@
 
 @using (Html.BeginForm("List", "Client", FormMethod.Post))
 {
     <div id="grid">
     @{
-        var grid = new WebGrid(Model, defaultSort: "ContactNumber", selectionFieldName: "SelectedRow", rowsPerPage: 6, ajaxUpdateContainerId: "grid");
+    var grid = new WebGrid( rowsPerPage: Model.PageSize, ajaxUpdateContainerId: "grid");
+        grid.Bind(Model.Clients,
+        autoSortAndPage: false,
+        rowCount: Model.TotalRows);
 
         @grid.GetHtml(
         tableStyle: "webgrid-table",
@@ -70,6 +94,10 @@
         selectedRowStyle: "webgrid-selected-row",
         rowStyle: "webgrid-row-style",
         mode: WebGridPagerModes.All,
+        firstText: "<< First",
+        previousText: "< Prev",
+        nextText: "Next >",
+        lastText: "Last >>",
 
         columns: grid.Columns(
             grid.Column(format: @<text>
@@ -111,32 +139,16 @@
             <button name="action" value="ShowAll">Show All</button>
         }
 
-        Count of VIP clients: @ViewBag.VipCount
+    Count of VIP clients: @ViewBag.VipCount
         Clients who did Deposit: @ViewBag.DepoCount
-    </div>
+        </div>
 }
 
     <script type="text/javascript">
-    function OnBegin() {
-        alert("Происходит отправка запроса");
-    }
 
-    function OnSuccess(data) {
-        alert("Запрос был успешно выполнен. Получены следующие данные: \n" + data);
-    }
-
-    function OnFailure(request, error) {
-        $("#results").html("Книги указанного автора не содержатся в базе данных.");
-    }
-
-    function OnComplete(request, status) {
-        alert("Статус запроса : " + status);
-    }
-
-
-    function ConfirmDelete(id) {
-        return confirm("Are you sure you want to delete client " + id + " ?");
-    }
+        function ConfirmDelete(id) {
+            return confirm("Are you sure you want to delete client " + id + " ?");
+        }
 
     $("tr").click(function () {
         $(".highlight").not(this).toggleClass("highlight");
@@ -151,7 +163,7 @@
         $.get("?Edit=" + id);
     });
 
-    // make highlight after Search ???
+    @*// make highlight after Search ???
     $(document).ready(function () {
         var searchList = '@ViewBag.SearchList';
         $("#grid tbody tr").each(function (i, row) {
@@ -166,7 +178,7 @@
                 $actualRow.toggleClass("highlight");
             }
         });
-    });
+    });*@
 
     // Add footer ???
     $(document).ready(function () {
@@ -174,7 +186,7 @@
         $('#grid').append(html);
     });
 
-</script>
+    </script>
 
 
 

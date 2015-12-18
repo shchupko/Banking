@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
@@ -12,37 +14,14 @@ namespace Banking.Controllers
 {
     public class ClientController : DefaultController
     {
-        //List<Client> clients;
-        //Client client;
+        const int PAGESIZE = 5;
 
         public ClientController(IRepository repo)
         {
             Repository = repo;
         }
 
-        [Authorize]
-        [HttpGet]
-        [HandleError(View = "Error")]
-        public ViewResult List()
-        {
-            Logger.Log.DebugFormat("ClientController.List({0})", Request.QueryString);
 
-            string v = Request["Edit"];
-            if (v != null)
-            {
-                //return List(null, "Edit=" + v);
-                var client = new Client();
-                return View("Person", client);
-            }
-
-            var clients = Repository.Clients.ToList();
-
-            ViewBag.DepoCount = clients.Where(item => item.Depo).Count();
-            ViewBag.VipCount = clients.Where(item => string.Compare(item.Status.Trim(), "VIP") == 0).Count();
-            ViewBag.TotalCount = clients.Count;
-
-            return View(clients);
-        }
 
         [HttpPost] // [HttpPost, ActionName("Edit")]
         public object List(string product, string action)
@@ -163,34 +142,139 @@ namespace Banking.Controllers
             return RedirectToAction("List", "Client");
         }
 
-        public RedirectToRouteResult PersonSearch(string name)
+        public ActionResult PersonSearch(string name)
         {
             var clients = Repository.Clients.ToList(); 
+
+            var resClients = clients.Where(a => a.Firstname.Contains(name)).ToList();      
             
-                    var resClients = from c in clients
-                                     where c.Firstname.Trim() == name
-                                     select c;
-            //var allbooks = db.Books.Where(a => a.Author.Contains(name)).ToList();
             if (resClients.Count() <= 0)
             {
                 ViewBag.SearchResult = "Nothing found";
             }
-            foreach (var client in resClients)
+
+            //Thread.Sleep(5000);
+            var data = new PagedClientsModel()
             {
-                client.Depo = true;
-                ViewBag.SearchResult = resClients.Count() + " found";
-                ViewBag.SearchList += client.ContactNumber + ";";
-            }
-            Thread.Sleep(5000);
-            return RedirectToAction("List", "Client");
+                TotalRows = resClients.Count,
+                PageSize = PAGESIZE,
+                Clients = resClients
+            };
+            return RedirectToAction("List", data);
         }
 
-        public JsonResult JsonSearch(string name)
-        {
-            var clients = Repository.Clients;
+        //public JsonResult JsonSearch(string name)
+        //{
+        //    var clients = Repository.Clients;
 
-            var jsondata = clients.Where(a => a.Firstname.Contains(name)).ToList<Client>();
-            return Json(jsondata, JsonRequestBehavior.AllowGet);
+        //    var jsondata = clients.Where(a => a.Firstname.Contains(name)).ToList<Client>();
+        //    return Json(jsondata, JsonRequestBehavior.AllowGet);
+        //}
+
+
+        [Authorize]
+        //[HandleError(View = "Error")]
+        [HttpGet]
+        public ActionResult List(int page = 1, string sort = "custid", string sortDir = "ASC")
+        {
+            Logger.Log.DebugFormat("ClientController.List({0})", Request.QueryString);
+
+            var clients = Repository.Clients.ToList();
+
+            ViewBag.DepoCount = clients.Where(item => item.Depo).Count();
+            ViewBag.VipCount = clients.Where(item => string.Compare(item.Status.Trim(), "VIP") == 0).Count();
+            ViewBag.TotalCount = clients.Count;
+
+            //string s = Request["sort"];
+            //string d = Request["sortdir"];
+            //if (s != null && d != null)
+            //{
+            //    sort = s;
+            //    sortDir = d;
+            //}
+            //    string v = Request["Edit"];
+            //    if (v != null)
+            //    {
+            //        //return List(null, "Edit=" + v);
+            //        var client = new Client();
+            //        return View("Person", client);
+            //    }
+
+            bool Dir = sortDir.Equals("desc", StringComparison.CurrentCultureIgnoreCase) ? true : false;
+
+            var clientsPage = GetClientsPage(clients, page, PAGESIZE, sort, Dir);
+            var data = new PagedClientsModel()
+            {
+                TotalRows = clients.Count,
+                PageSize = PAGESIZE,
+                Clients = clientsPage
+            };
+            return View(data);
+        }
+
+        //For Custom Paging
+        public IEnumerable<Client> GetClientsPage(List<Client> clients, int pageNumber, int pageSize, string sort, bool Dir)
+        {
+            if (pageNumber < 1)
+                pageNumber = 1;
+
+            if (sort == "Birsday")
+                return clients.OrderByWithDirection(x => x.Birsday, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            else if (sort == "Lastname")
+                return clients.OrderByWithDirection(x => x.Lastname, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            else if (sort == "Firstname")
+                return clients.OrderByWithDirection(x => x.Firstname, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            else if (sort == "Status")
+                return clients.OrderByWithDirection(x => x.Status, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            else if (sort == "Phone")
+                return clients.OrderByWithDirection(x => x.Phone, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            else if (sort == "Depo")
+                return clients.OrderByWithDirection(x => x.Depo, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();            
+            else
+                return clients.OrderByWithDirection(x => x.ContactNumber, Dir)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+
+
+    }
+
+    public class PagedClientsModel
+    {
+        public int TotalRows { get; set; }
+        public IEnumerable<Client> Clients { get; set; }
+        public int PageSize { get; set; }
+    }
+
+
+
+    public static class SortExtension
+    {
+        public static IOrderedEnumerable<TSource> OrderByWithDirection<TSource, TKey>
+            (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, bool descending)
+        {
+            return descending
+                ? source.OrderByDescending(keySelector)
+                : source.OrderBy(keySelector);
         }
     }
 }
