@@ -32,7 +32,7 @@ body {
     .mflex(1);
 
 	/*box-sizing: border-box;*/
-    text-align: @text-align;
+    /*text-align: @text-align;*/
 }
 
 /*Примеси Начало*/
@@ -42,7 +42,7 @@ body {
         display:-moz-box;
         display:-ms-flexbox;
         display:-webkit-flex;
-        display:flex;
+        display:-flex;
     }
 
     /*Прямая колонка*/
@@ -221,7 +221,7 @@ input[type=submit] {
 
 .webgrid
 {
-        &-table {
+    &-table {
         /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
         font-size: 1.2em;
         width: 100%;*/
@@ -259,6 +259,17 @@ input[type=submit] {
         /*vertical-align:bottom;*/
     }
 }
+
+table.text {
+    width: 100%; /* Ширина таблицы */
+    border-spacing: 0; /* Расстояние между ячейками */
+    text-align: left; /* Выравнивание по правому краю */
+}
+td.rightcol { /* Правая ячейка */
+    text-align: right; /* Выравнивание по правому краю */
+}
+
+
 
 .highlight {
     background: yellow;

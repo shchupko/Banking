@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Banking.Domain.Abstract;
 
 namespace Banking.Domain.Concrete
 {
-    public partial class SqlRepository
+    public class ClientSqlRepository : IClientSqlRepository
     {
+        public BankingDbDataContext Db = new BankingDbDataContext();
+
         public IEnumerable<Client> Clients
         {
             get

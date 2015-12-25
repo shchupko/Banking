@@ -15,10 +15,12 @@ namespace Banking.Controllers
     public class ClientController : DefaultController
     {
         const int PAGESIZE = 5;
+        public IClientSqlRepository Repository { get; set; }
 
-        public ClientController(IRepository repo)
+        public ClientController(IClientSqlRepository repo)
         {
             Repository = repo;
+            
         }
 
 
@@ -51,10 +53,6 @@ namespace Banking.Controllers
                     var vipClients = from c in clients
                                      where c.Status.Trim() == "VIP"
                                      select c;
-
-                    ViewBag.DepoCount = clients.Where(item => item.Depo).Count();
-                    ViewBag.VipCount = clients.Where(item => string.Compare(item.Status.Trim(), "VIP") == 0).Count();
-                    ViewBag.TotalCount = null;
 
                     clients = vipClients.ToList();
                 }
@@ -97,7 +95,10 @@ namespace Banking.Controllers
             {
                 Logger.Log.Error("Unhandled action");
             }
-            return View(clients);
+
+            var clientsPage = GetClientsPage(clients);
+
+            return View(clientsPage);
         }
 
 
@@ -118,7 +119,7 @@ namespace Banking.Controllers
                 client.Depo = false;
             }
 
-            return View(client);
+            return View("Person", client);
         }
 
 
@@ -142,25 +143,25 @@ namespace Banking.Controllers
             return RedirectToAction("List", "Client");
         }
 
-        public ActionResult PersonSearch(string name)
+        public ViewResult ListQuery(string name)
         {
             var clients = Repository.Clients.ToList(); 
 
             var resClients = clients.Where(a => a.Firstname.Contains(name)).ToList();      
             
-            if (resClients.Count() <= 0)
-            {
-                ViewBag.SearchResult = "Nothing found";
-            }
+            //if (resClients.Count() <= 0)
+            //{
+            //    ViewBag.SearchResult = "Nothing found";
+            //}
+            if(ViewBag.isFiltered == "true")
+                ViewBag.isFiltered = "false";
+            else
+                ViewBag.isFiltered = "true";
 
-            //Thread.Sleep(5000);
-            var data = new PagedClientsModel()
-            {
-                TotalRows = resClients.Count,
-                PageSize = PAGESIZE,
-                Clients = resClients
-            };
-            return RedirectToAction("List", data);
+            var clientsPage = GetClientsPage(resClients);
+
+            //return RedirectToAction("List", data);
+            return View("List", clientsPage);
         }
 
         //public JsonResult JsonSearch(string name)
@@ -175,15 +176,11 @@ namespace Banking.Controllers
         [Authorize]
         //[HandleError(View = "Error")]
         [HttpGet]
-        public ActionResult List(int page = 1, string sort = "custid", string sortDir = "ASC")
+        public ActionResult List(int page = 1, string sort = "ContactNumber", string sortDir = "ASC")
         {
             Logger.Log.DebugFormat("ClientController.List({0})", Request.QueryString);
 
             var clients = Repository.Clients.ToList();
-
-            ViewBag.DepoCount = clients.Where(item => item.Depo).Count();
-            ViewBag.VipCount = clients.Where(item => string.Compare(item.Status.Trim(), "VIP") == 0).Count();
-            ViewBag.TotalCount = clients.Count;
 
             //string s = Request["sort"];
             //string d = Request["sortdir"];
@@ -203,56 +200,62 @@ namespace Banking.Controllers
             bool Dir = sortDir.Equals("desc", StringComparison.CurrentCultureIgnoreCase) ? true : false;
 
             var clientsPage = GetClientsPage(clients, page, PAGESIZE, sort, Dir);
-            var data = new PagedClientsModel()
-            {
-                TotalRows = clients.Count,
-                PageSize = PAGESIZE,
-                Clients = clientsPage
-            };
-            return View(data);
+
+            return View("List", clientsPage);
         }
 
         //For Custom Paging
-        public IEnumerable<Client> GetClientsPage(List<Client> clients, int pageNumber, int pageSize, string sort, bool Dir)
+        private PagedClientsModel GetClientsPage(List<Client> clients, int pageNumber = 1, int pageSize = PAGESIZE, string sort = "ContactNumber", bool Dir = false)
         {
             if (pageNumber < 1)
                 pageNumber = 1;
 
+            var data = new PagedClientsModel()
+            {
+                TotalRows = clients.Count,
+                PageSize = pageSize
+            };
+
             if (sort == "Birsday")
-                return clients.OrderByWithDirection(x => x.Birsday, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.Birsday, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
             else if (sort == "Lastname")
-                return clients.OrderByWithDirection(x => x.Lastname, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.Lastname, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
             else if (sort == "Firstname")
-                return clients.OrderByWithDirection(x => x.Firstname, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.Firstname, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
             else if (sort == "Status")
-                return clients.OrderByWithDirection(x => x.Status, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.Status, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
             else if (sort == "Phone")
-                return clients.OrderByWithDirection(x => x.Phone, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.Phone, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
             else if (sort == "Depo")
-                return clients.OrderByWithDirection(x => x.Depo, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.Depo, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();            
             else
-                return clients.OrderByWithDirection(x => x.ContactNumber, Dir)
+                data.Clients = clients.OrderByWithDirection(x => x.ContactNumber, Dir)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
+
+            data.DepoCount = data.Clients.Where(item => item.Depo).Count();
+            data.VipCount = data.Clients.Where(item => string.Compare(item.Status.Trim(), "VIP") == 0).Count();
+
+            return data;
         }
 
 
@@ -263,6 +266,10 @@ namespace Banking.Controllers
         public int TotalRows { get; set; }
         public IEnumerable<Client> Clients { get; set; }
         public int PageSize { get; set; }
+
+        public int DepoCount;
+        public int VipCount;
+        public int TotalCount;
     }
 
 

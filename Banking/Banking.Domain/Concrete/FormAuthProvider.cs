@@ -13,8 +13,8 @@ namespace Banking.Domain.Concrete
 {
     public class FormAuthProvider : IAuthProvider
     {
-        public IRepository Repository { get; set; }
-        public FormAuthProvider(IRepository repo)
+        public IUserSqlRepository Repository { get; set; }
+        public FormAuthProvider(IUserSqlRepository repo)
         {
             Repository = repo;
         }

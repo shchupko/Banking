@@ -2,55 +2,63 @@
 using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
+using Banking.Domain;
 using Banking.Domain.Abstract;
+using Banking.Domain.Concrete;
 using Banking.Mappers;
 using Banking.Tests.Mock;
+using Moq;
 using NUnit.Framework;
 
 
 namespace Banking.Tests.Setup
 {
-    [TestFixture]
+    [TestFixture] //???
     public class UnitTestSetupFixture
     {
-        protected static string Sandbox = "../../Sandbox";
-
         [OneTimeSetUp]
-        public void Setup()
+        public virtual void Setup()
         {
             Console.WriteLine("=====START=====");
             
-            //InitRepository();
-
             ConfigureContainer();
         }
 
-        [TearDown]
-        public void TearDown()
+        [OneTimeTearDown]
+        public virtual void TearDown()
         {
             Console.WriteLine("=====FINISH======");
 
         }
 
-        public static void ConfigureContainer()
+        protected virtual void ConfigureContainer()
         {
-            // получаем экземпляр контейнера
             var builder = new ContainerBuilder();
 
-            // регистрируем контроллер в текущей сборке
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
-            //builder.Register<BankingDbDataContext>(c => new BankingDbDataContext(ConfigurationManager.ConnectionStrings["BankingDb"].ConnectionString));
+            InitRepository(builder);
 
             builder.RegisterType<CommonMapper>().As<IMapper>().SingleInstance();
-            //builder.RegisterType<FormAuthProvider>().As<IAuthProvider>();
-            builder.RegisterType<MockRepository>().As<IRepository>().InstancePerRequest();
+            builder.RegisterType<FormAuthProvider>().As<IAuthProvider>();
+            //builder.RegisterType<MockRepositoryUser>().As<IUserSqlRepository>().InstancePerRequest();
+            //builder.RegisterType<ClientSqlRepository>().As<IClientSqlRepository>().InstancePerRequest();
+           
+           // builder.RegisterInstance(HttpRequestScopedFactoryFor<IUserSqlRepository>()); 
+            builder.RegisterModule(new AutofacWebTypesModule());
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
             var container = builder.Build();
 
             // установка сопоставителя зависимостей
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+        }
+
+        protected virtual void InitRepository(ContainerBuilder builder)
+        {
+            // builder.RegisterType<MockSqlRepository>().As<ISqlRepository>().InstancePerRequest();
+            builder.Register<BankingDbDataContext>(c => new MockBankingDbDataContext().Object).SingleInstance();
+
         }
     }
 }

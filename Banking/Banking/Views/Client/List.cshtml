@@ -35,7 +35,7 @@
         }
     </script>
 
-    @using (Ajax.BeginForm("PersonSearch", new AjaxOptions
+    @using (Ajax.BeginForm("ListQuery", new AjaxOptions
     {
         UpdateTargetId = "results",
         Confirm = "Выполнить AJAX-запрос?",
@@ -123,32 +123,48 @@
         ) // columns: grid.Columns(
         ) //@grid.GetHtml(
     }
-    @*@if (grid.HasSelection)  { @Html.Action("Person", "Client", new { Client = grid.SelectedRow});   }*@
     </div>
 
-    <div class="webgrid-footer">
-        <button name="action" value="New">Create New Client</button>
 
-        @if (ViewBag.TotalCount != null)
-        {
-            <button name="action" value="Vip">Show Only Vip</button>
-            @:Total count of clients: @ViewBag.TotalCount
-    }
-        else
-        {
-            <button name="action" value="ShowAll">Show All</button>
+    <style>
+        table.text {
+            
+           width: 100%; /* Ширина таблицы */
+           border-spacing: 0; /* Расстояние между ячейками */
+            text-align: left; /* Выравнивание по правому краю */
         }
+        td.rightcol { /* Правая ячейка */
+            text-align: right; /* Выравнивание по правому краю */
+        }
+    </style>
 
-    Count of VIP clients: @ViewBag.VipCount
-        Clients who did Deposit: @ViewBag.DepoCount
-        </div>
+
+    <table class="text">
+        <td >
+            <button name="action" value="New">Create New Client</button>
+
+            @if (ViewBag.OnlyVip == "true" || ViewBag.isFiltered == "true")
+            {
+                <button name="action" value="ShowAll">Show All</button>
+            }
+            else
+            {
+                <button name="action" value="Vip">Show Only Vip</button>
+            }
+        </td>
+        <td class="rightcol">
+            Total count of clients: @Model.TotalRows &nbsp;
+            Count of VIP clients: @Model.VipCount &nbsp;
+            Clients who did Deposit: @Model.DepoCount &nbsp;
+        </td>
+    </table>
 }
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
-        function ConfirmDelete(id) {
-            return confirm("Are you sure you want to delete client " + id + " ?");
-        }
+    function ConfirmDelete(id) {
+        return confirm("Are you sure you want to delete client " + id + " ?");
+    }
 
     $("tr").click(function () {
         $(".highlight").not(this).toggleClass("highlight");
@@ -160,7 +176,7 @@
     $("tr").dblclick(function () {
         console.log($(this).text());
         var id = $(this).find("td:nth-child(2)").text();
-        $.get("?Edit=" + id);
+        $.post("?Edit=" + id);
     });
 
     @*// make highlight after Search ???
@@ -186,7 +202,7 @@
         $('#grid').append(html);
     });
 
-    </script>
+</script>
 
 
 

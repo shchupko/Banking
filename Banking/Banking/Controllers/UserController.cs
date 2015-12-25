@@ -9,8 +9,10 @@ using System.Web.Security;
 using Banking.Controllers;
 using Banking.Tools;
 using System.Drawing.Imaging;
+using System.IO;
 using Banking.Mappers;
 using Banking.Domain.Models.ViewModels;
+using Banking.Tests.Tools.Mail;
 
 
 namespace Banking.Controllers
@@ -18,8 +20,9 @@ namespace Banking.Controllers
     public class UserController : DefaultController
     {
         IAuthProvider authProvider;
+        public IUserSqlRepository Repository { get; set; }
 
-        public UserController(IAuthProvider auth, IRepository repo, IMapper mapper)
+        public UserController(IAuthProvider auth, IUserSqlRepository repo, IMapper mapper)
         {
             authProvider = auth;
             Repository = repo;
@@ -33,10 +36,52 @@ namespace Banking.Controllers
             return View("qtip");
         }
 
-        [HttpGet]
-        public ActionResult Register()
+
+        [HttpPost]
+        public ActionResult ForgotPassword(ForgotPasswordView user)
         {
-            Logger.Log.Debug("User.Register()");
+            Logger.Log.DebugFormat("User.ForgotPassword() [HttpPost] email {0}", user.Email);
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                return View(user);
+            }
+
+            var userDb = Repository.GetUserByEmail(user.Email);
+
+            if (null == userDb)
+            {
+                string msg = "Email absent in DB: " + user.Email;
+                ModelState.AddModelError("Login", msg);
+            }
+            else
+            {
+                //userDb.Email = "smart358@ukr.net";
+
+                NotifyMail.SendNotify("ForgotPassword", userDb.Email,
+                    subject => string.Format(subject, HostName),
+                    body => string.Format(body, userDb.Login, userDb.Password, HostName));
+
+                ViewBag.Msg = "Email was sent";
+            }
+            return View(user);
+        }
+
+        [HttpGet]
+        public ActionResult ForgotPassword()
+        {
+            Logger.Log.DebugFormat("User.ForgotPassword() [HttpGet] ");
+
+            var newUser = new ForgotPasswordView();
+            return View(newUser);
+        }
+
+
+        [HttpGet]
+        public ActionResult Register(string login)
+        {
+            Logger.Log.DebugFormat("User.Register() [HttpGet] login {0}", login);
+
             var newUser = new UserRegisterView();
             return View(newUser);
         }
@@ -62,10 +107,16 @@ namespace Banking.Controllers
                 var user = (User)ModelMapper.Map(userRegView, typeof(UserRegisterView), typeof(User));
 
                 Repository.CreateUser(user);
+
+                NotifyMail.SendNotify("Register", user.Email,
+                    subject => string.Format(subject, HostName),
+                    body => string.Format(body, "", HostName));
+
                 return RedirectToAction("Login");
             }
             return View(userRegView);
         }
+
 
         public ActionResult Captcha()
         {
@@ -88,14 +139,14 @@ namespace Banking.Controllers
         [HttpGet]
         public ViewResult Login()
         {
-            Logger.Log.Debug("User.Login() HttpGet");
+            Logger.Log.Debug("User.Login() [HttpGet]");
             return View("Login");
         }
 
         [HttpPost]
-        public ActionResult Login(UserLoginView model, string returnUrl)
+        public ActionResult Login(UserLoginView model)
         {
-            Logger.Log.DebugFormat("User.Login() HttpPost. RememberMe {0}, returnUrl {1}", model.RememberMe.ToString(), returnUrl);
+            Logger.Log.DebugFormat("User.Login() [HttpPost]. RememberMe {0}", model.RememberMe.ToString());
 
             //Page.Validate();
             if (ModelState.IsValid)
@@ -104,8 +155,8 @@ namespace Banking.Controllers
                 if (authProvider.Authenticate(model, out msg))
                 {
                     Logger.Log.InfoFormat("User {0} Authenticate succesful", model.Login);
-                    //return RedirectToAction("List", "Client", model.Login);
-                    return Redirect(returnUrl ?? Url.Action("List", "Client"));
+                    return RedirectToAction("List", "Client");
+                    //return Redirect(Url.Action("List", "Client"));
                 }
                 else
                 {
@@ -117,7 +168,7 @@ namespace Banking.Controllers
             else
             {
                 Logger.Log.Warn("Credantials don't valid");
-                return View();
+                return View("Login");
             }
         }
 
@@ -128,6 +179,28 @@ namespace Banking.Controllers
             return Redirect(Url.Action("Index", "Home"));
         }
 
+        //[Authorize]
+        //public ActionResult SubscriptionTest()
+        //{
+        //    var mailController = new MailController();
 
+        //    var email = mailController.Subscription("Привет, мир!", CurrentUser.Email);
+        //    email.Deliver();
+        //    return Content("OK");
+        //}
+
+        //[Authorize]
+        //public ActionResult SubscriptionShow()
+        //{
+        //    var mailController = new MailController();
+        //    var email = mailController.Subscription("Привет, мир!", CurrentUser.Email);
+
+        //    using (var reader = new StreamReader(email.Mail.AlternateViews[0].ContentStream))
+        //    {
+        //        var content = reader.ReadToEnd();
+        //        return Content(content);
+        //    }
+        //    return null;
+        //}
     }
 }

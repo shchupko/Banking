@@ -7,8 +7,9 @@
 @using (Html.BeginForm())
 {
     <h4>Please enter your credentials:</h4>
+    @Html.ValidationSummary()
     <div>
-        @Html.ValidationSummary()
+        
         <label for="Login">Login</label>
         @Html.TextBoxFor(x => x.Login, "Login", new { required = "required", placeholder = "John" })
         <br>
@@ -21,8 +22,10 @@
         </p>
 
         <input type="submit" value="Submit" class="btn" />
-      
-    @Html.ActionLink("Register new account", "Register")
+
+        <p> @Html.ActionLink("Register new account", "Register")</p>
+        <p> @Html.ActionLink("Forgot password", "ForgotPassword") </p>
+
     </div>
 }
 

@@ -21,7 +21,9 @@ namespace Banking.Domain.Models.ViewModels
         [Required(ErrorMessage = "Enter email")]
         public string Email { get; set; }
 
-        public string Address { get; set; }        
+        public string Address { get; set; }
+
+        [Required(ErrorMessage = "Enter Captcha")]
         public string Captcha { get; set; }
     }
 
@@ -34,5 +36,11 @@ namespace Banking.Domain.Models.ViewModels
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }
+    }
+
+    public class ForgotPasswordView
+    {
+        [Required(ErrorMessage = "Enter email")]
+        public string Email { get; set; }
     }
 }

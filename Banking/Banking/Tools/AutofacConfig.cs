@@ -19,18 +19,15 @@ namespace Banking.Tools
  
             // регистрируем контроллер в текущей сборке
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
- 
-            // регистрируем споставление типов 
-            //kernel.Bind<BankingDbDataContext>().ToMethod(c => new BankingDbDataContext(ConfigurationManager.ConnectionStrings["EFDbContext"].ConnectionString));
-            builder.Register<BankingDbDataContext>(c => new BankingDbDataContext(ConfigurationManager.ConnectionStrings["BankingDb"].ConnectionString));
 
-            //kernel.Bind<IMapper>().To<CommonMapper>().InSingletonScope();
-            //kernel.Bind<IAuthProvider>().To<FormAuthProvider>();
-            //kernel.Bind<IUserRepository>().To<SqlRepository>().InRequestScope();
+            var connectionstring = ConfigurationManager.ConnectionStrings["BankingDb"].ConnectionString;
+            builder.Register<BankingDbDataContext>(c => new BankingDbDataContext(connectionstring));
+
+
             builder.RegisterType<CommonMapper>().As<IMapper>().SingleInstance();
             builder.RegisterType<FormAuthProvider>().As<IAuthProvider>();
-            builder.RegisterType<SqlRepository>().As<IRepository>().InstancePerRequest();
-
+            builder.RegisterType<UserSqlRepository>().As<IUserSqlRepository>().InstancePerRequest();
+            builder.RegisterType<ClientSqlRepository>().As<IClientSqlRepository>().InstancePerRequest();
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
             var container = builder.Build();

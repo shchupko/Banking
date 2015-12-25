@@ -2,7 +2,10 @@
 using Banking.Mappers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 
@@ -11,8 +14,30 @@ namespace Banking.Controllers
     public abstract class DefaultController : Controller
     {
         public IMapper ModelMapper { get; set; }
+        public static string HostName = string.Empty;
 
-        public IRepository Repository { get; set; }
+        protected override void Initialize(System.Web.Routing.RequestContext requestContext)
+        {
+            if (requestContext.HttpContext.Request.Url != null)
+            {
+                HostName = requestContext.HttpContext.Request.Url.Authority;
+            }
+
+            try
+            {
+                string lang = ConfigurationManager.AppSettings["Culture"] as string;
+                var cultureInfo = new CultureInfo(lang);
+
+                Thread.CurrentThread.CurrentCulture = cultureInfo;
+                Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log.ErrorFormat("Culture not found", ex);
+            }
+
+            base.Initialize(requestContext);
+        }
 
         //protected override void OnException(ExceptionContext filterContext)
         //{

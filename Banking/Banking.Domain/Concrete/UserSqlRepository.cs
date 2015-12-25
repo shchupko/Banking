@@ -1,19 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
+using Banking.Domain.Abstract;
 
 namespace Banking.Domain.Concrete
 {
-    public partial class SqlRepository
+    public class UserSqlRepository : IUserSqlRepository
     {
+        public BankingDbDataContext Db;
+
+        public UserSqlRepository(BankingDbDataContext db = null)
+        {
+            if (db == null)
+            {
+                Db = new BankingDbDataContext();
+            }
+            else
+            {
+                Db = db;
+            }
+        }
+
         public IEnumerable<User> Users
         {
             get { return Db.Users; }
         }
 
+        public static string GetActivateUrl()
+        {
+            return Guid.NewGuid().ToString("N");
+        }
         public bool CreateUser(User instance)
         {
             if (instance.Id == 0)
@@ -21,6 +38,7 @@ namespace Banking.Domain.Concrete
                 instance.RegDate = DateTime.Now;
                 instance.AttemptCounter = 0;
                 instance.IsBlock = false;
+                //instance.ActivatedLink = GetActivateUrl(); todo
                 Db.Users.InsertOnSubmit(instance);
                 Db.Users.Context.SubmitChanges();
                 return true;
@@ -58,6 +76,11 @@ namespace Banking.Domain.Concrete
         public User GetUser(string login)
         {
             return Db.Users.FirstOrDefault(p => string.Compare(p.Login, login, true) == 0);
+        }
+
+        public User GetUserByEmail(string email)
+        {
+            return Db.Users.FirstOrDefault(p => string.Compare(p.Email, email, true) == 0);
         }
 
         [HandleError( View = "Error")]

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Web.Mvc;
+using Moq;
 
 
 namespace Banking.Tests.Tools
@@ -17,8 +19,36 @@ namespace Banking.Tests.Tools
         }
     }
 
-    public class Validator
+    /// <summary>
+    /// Instance of a controller for testing things that use controller methods i.e. controller.TryValidateModel(model)
+    /// </summary>
+    public class ModelStateTestController : Controller
     {
+        public ModelStateTestController()
+        {
+            ControllerContext = (new Mock<ControllerContext>()).Object;
+        }
+
+        public bool TestTryValidateModel(object model)
+        {
+            return TryValidateModel(model);
+        }
+    }
+
+    public class ValidatorTool
+    {
+        public static IList<ValidationResult> GetValidationErrors(object model)
+        {
+            var validationContext = new ValidationContext(model, null, null);
+            var validationResults = new List<ValidationResult>();
+
+            // fix of: MVC Controller post method unit test: ModelState.IsValid always true
+            //TypeDescriptor.AddProviderTransparent(new AssociatedMetadataTypeTypeDescriptionProvider(typeof(POSViewModel), typeof(POSViewModel)), typeof(POSViewModel));
+
+            System.ComponentModel.DataAnnotations.Validator.TryValidateObject(model, validationContext, validationResults);
+            return validationResults;
+        }
+
         public static void ValidateObject<T>(T obj)
         {
             var type = typeof(T);

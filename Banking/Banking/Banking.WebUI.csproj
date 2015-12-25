@@ -48,12 +48,6 @@
     <Reference Include="AutoMapper">
       <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net.dll</HintPath>
@@ -151,8 +145,8 @@
     <Compile Include="Attribute\Validation\ValidEmai.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ClientController.cs" />
-    <Compile Include="Controllers\GridController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MailController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -162,6 +156,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\AutofacConfig.cs" />
     <Compile Include="Tools\CaptchaImage.cs" />
+    <Compile Include="Tools\Mail\MailSender.cs" />
+    <Compile Include="Tools\Mail\MailSetting.cs" />
+    <Compile Include="Tools\Mail\MailTemplates.cs" />
+    <Compile Include="Tools\Mail\NotifyMail.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -206,11 +204,11 @@
     <Content Include="Views\Home\Flex.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\User\qtip.cshtml" />
-    <Content Include="Views\Client\PersonSearch.cshtml" />
+    <Content Include="Views\User\ForgotPassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Grid\" />
+    <Folder Include="Views\Mail\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
