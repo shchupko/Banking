@@ -6,7 +6,9 @@ using Banking.Domain.Abstract;
 using Banking.Domain.Concrete;
 using Banking.Mappers;
 using System.Configuration;
+using System.Linq;
 using System.Web.Mvc;
+using Banking.Domain.Mail;
 
 namespace Banking.Tools
 {
@@ -28,6 +30,11 @@ namespace Banking.Tools
             builder.RegisterType<FormAuthProvider>().As<IAuthProvider>();
             builder.RegisterType<UserSqlRepository>().As<IUserSqlRepository>().InstancePerRequest();
             builder.RegisterType<ClientSqlRepository>().As<IClientSqlRepository>().InstancePerRequest();
+            builder.RegisterType<NotifyMail>().As<INotifyMail>().InstancePerRequest();
+
+            //MailTemplateConfigSection configInfo = (MailTemplateConfigSection)ConfigurationManager.GetSection("mailTemplateConfig");
+            //var mailTemplates = configInfo.MailTemplates.OfType<MailTemplate>().AsQueryable<MailTemplate>();
+            //builder.Register<NotifyMail>(c => new NotifyMail(mailTemplates));
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
             var container = builder.Build();

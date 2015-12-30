@@ -2,16 +2,16 @@
 <ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="BankingDb">
   <DataContextMoniker Name="/BankingDbDataContext" />
   <nestedChildShapes>
-    <classShape Id="f840f26c-d1ad-41ca-a778-99fe4d67df5e" absoluteBounds="4.75, 1.25, 2, 0.8093896484375">
-      <DataClassMoniker Name="/BankingDbDataContext/User" />
-      <nestedChildShapes>
-        <elementListCompartment Id="803fbb4e-879e-4129-8cac-fddfe9723939" isExpanded="false" absoluteBounds="4.765, 1.71, 1.9700000000000002, 0.2493896484375" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
     <classShape Id="19d34d22-417d-4e7d-8cec-dc39c45d89b4" absoluteBounds="2.5, 1.5, 2, 2.1554996744791666">
       <DataClassMoniker Name="/BankingDbDataContext/Client" />
       <nestedChildShapes>
         <elementListCompartment Id="5f8d7593-4824-418f-a151-f73e7de85b3b" absoluteBounds="2.515, 1.96, 1.9700000000000002, 1.5954996744791665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="ac9cbcab-16dd-4b21-88b2-6210b0ecb601" absoluteBounds="7, 2, 2, 2.9247054036458331">
+      <DataClassMoniker Name="/BankingDbDataContext/User" />
+      <nestedChildShapes>
+        <elementListCompartment Id="4b4ceaeb-8e9e-4392-8b05-b1ad746757c6" absoluteBounds="7.015, 2.46, 1.9700000000000002, 2.364705403645833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
   </nestedChildShapes>

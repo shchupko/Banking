@@ -156,10 +156,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\AutofacConfig.cs" />
     <Compile Include="Tools\CaptchaImage.cs" />
-    <Compile Include="Tools\Mail\MailSender.cs" />
-    <Compile Include="Tools\Mail\MailSetting.cs" />
-    <Compile Include="Tools\Mail\MailTemplates.cs" />
-    <Compile Include="Tools\Mail\NotifyMail.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -205,6 +201,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\User\qtip.cshtml" />
     <Content Include="Views\User\ForgotPassword.cshtml" />
+    <Content Include="Views\User\ConfirmEmail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

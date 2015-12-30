@@ -100,15 +100,6 @@
         lastText: "Last >>",
 
         columns: grid.Columns(
-            grid.Column(format: @<text>
-                <button name="action" value=@string.Format("Edit={0}", @item.ContactNumber)>Edit</button>
-                <button name="action" value=@string.Format("Delete={0}", @item.ContactNumber)
-                        onclick="javascript:return ConfirmDelete(@item.ContactNumber);">
-                    Delete
-                </button>
-            </text>),
-            @*grid.Column(format: @<text>@Html.ActionLink(item.ContactNumber, "Delete", "DeleteAction", new { id = item.ContactNumber }, null)</text>),*@
-
             grid.Column(columnName: "ContactNumber", header: "Client Contract Number",
                 @*format: @<text>@item.GetSelectLink(@item.ContactNumber.ToString("000000"))</text>),*@
                 format: @<text>@item.ContactNumber.ToString("000000")</text>),
@@ -119,10 +110,21 @@
             grid.Column(columnName: "Phone", header: "Phone number", format: @<text>@item.Phone</text>),
             grid.Column(columnName: "Status", header: "Status"),
             grid.Column(columnName: "Depo", header: "Deposit",
-                format: (item) => Html.CheckBox("depo", @item.depo == null ? false : item.depo ? true : false))
+                format: (item) => Html.CheckBox("depo", @item.depo == null ? false : item.depo ? true : false)),
+            grid.Column(format: 
+                @<text>
+                <button name="action" value=@string.Format("Delete={0}", @item.ContactNumber)
+                        onclick="javascript:return ConfirmDelete(@item.ContactNumber);">
+                    Delete
+                </button> 
+                <button name="action" value=@string.Format("Edit={0}", @item.ContactNumber)>Edit</button>
+                <button name="action" value=@string.Format("Print={0}", @item.ContactNumber)>Print</button>
+                </text>)
+            @*grid.Column(format: @<text>@Html.ActionLink(item.ContactNumber, "Delete", "DeleteAction", new { id = item.ContactNumber }, null)</text>),*@
+        
         ) // columns: grid.Columns(
         ) //@grid.GetHtml(
-    }
+}
     </div>
 
 

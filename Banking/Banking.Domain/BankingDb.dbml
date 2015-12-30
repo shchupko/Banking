@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="BankingDb" Class="BankingDbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
   <Connection Mode="AppSettings" ConnectionString="Data Source=localhost;Initial Catalog=BankingDb;User ID=sa;Pooling=False;MultipleActiveResultSets=True;Application Name=EntityFramework" SettingsObjectName="Banking.Domain.Properties.Settings" SettingsPropertyName="BankingDbConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Clients" Member="Clients">
+    <Type Name="Client">
+      <Column Name="ContactNumber" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Firstname" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Lastname" Type="System.String" DbType="NChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Birsday" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="Phone" Type="System.String" DbType="NChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Status" Type="System.String" DbType="NChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="Depo" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
   <Table Name="dbo.Users" Member="Users">
     <Type Name="User">
       <Column Name="Id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -10,18 +21,9 @@
       <Column Name="Cookies" Type="System.String" DbType="NChar(100)" CanBeNull="true" />
       <Column Name="AttemptCounter" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="RegDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Column Name="IsBlock" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
-    </Type>
-  </Table>
-  <Table Name="dbo.Clients" Member="Clients">
-    <Type Name="Client">
-      <Column Name="ContactNumber" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="Firstname" Type="System.String" DbType="NVarChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="Lastname" Type="System.String" DbType="NChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="Birsday" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="Phone" Type="System.String" DbType="NChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="Status" Type="System.String" DbType="NChar(100) NOT NULL" CanBeNull="false" />
-      <Column Name="Depo" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="IsBlock" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="isConfirmedEmail" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="Guid" Type="System.String" DbType="NChar(100)" CanBeNull="true" />
     </Type>
   </Table>
 </Database>

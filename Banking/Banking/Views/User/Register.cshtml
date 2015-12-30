@@ -38,6 +38,8 @@
         @Html.TextBox("Captcha", Model.Captcha, new { type = "number", placeholder = "Enter picture text" })
         @Html.ValidationMessage("Captcha")<br>
 
+        @Html.CheckBox("SkipEmailConfirmation", true) Skip email confirmation<br/>
+
         <input type="submit" value="Register" class="btn" />
         @Html.ActionLink("Cancel", "Login", null, null, new { @class = "btn" })
 </div>

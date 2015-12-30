@@ -5,28 +5,27 @@ using System.Web;
 using System.Web.Mvc;
 using Banking.Domain;
 using Banking.Domain.Abstract;
-using System.Web.Security;
-using Banking.Controllers;
 using Banking.Tools;
 using System.Drawing.Imaging;
-using System.IO;
+using Banking.Domain.Mail;
 using Banking.Mappers;
 using Banking.Domain.Models.ViewModels;
-using Banking.Tests.Tools.Mail;
+
 
 
 namespace Banking.Controllers
 {
     public class UserController : DefaultController
     {
-        IAuthProvider authProvider;
+        public IAuthProvider authProvider;
         public IUserSqlRepository Repository { get; set; }
 
-        public UserController(IAuthProvider auth, IUserSqlRepository repo, IMapper mapper)
+        public UserController(IAuthProvider auth = null, IUserSqlRepository repo = null, IMapper mapper = null, INotifyMail mail = null)
         {
             authProvider = auth;
             Repository = repo;
             ModelMapper = mapper;
+            mailProvider = mail;
         }
 
         [HttpGet]
@@ -56,9 +55,9 @@ namespace Banking.Controllers
             }
             else
             {
-                //userDb.Email = "smart358@ukr.net";
+                var mail = new NotifyMail();
 
-                NotifyMail.SendNotify("ForgotPassword", userDb.Email,
+                mailProvider.SendNotify("ForgotPassword", userDb.Email,
                     subject => string.Format(subject, HostName),
                     body => string.Format(body, userDb.Login, userDb.Password, HostName));
 
@@ -104,15 +103,23 @@ namespace Banking.Controllers
 
             if (ModelState.IsValid)
             {
-                var user = (User)ModelMapper.Map(userRegView, typeof(UserRegisterView), typeof(User));
-
+                var user = (User)ModelMapper.Map(userRegView, typeof(UserRegisterView), typeof(User));           
                 Repository.CreateUser(user);
 
-                NotifyMail.SendNotify("Register", user.Email,
-                    subject => string.Format(subject, HostName),
-                    body => string.Format(body, "", HostName));
+                if (!userRegView.SkipEmailConfirmation)
+                {
+                    mailProvider.SendNotify("Register", user.Email,
+                        subject => string.Format(subject, HostName),
+                        body => string.Format(body,
+                            Url.Action("ConfirmAndUnblock", "User", new { Token = user.Guid},
+                                Request.Url.Scheme), HostName));
 
-                return RedirectToAction("Login");
+                    return RedirectToAction("ConfirmEmail", "User", new { msg = "Please confirm your email", login = user.Login });
+                }
+                else
+                {
+                    return RedirectToAction("Login");
+                }
             }
             return View(userRegView);
         }
@@ -151,17 +158,34 @@ namespace Banking.Controllers
             //Page.Validate();
             if (ModelState.IsValid)
             {
-                string msg = null;
-                if (authProvider.Authenticate(model, out msg))
+                string msg;
+                int attemptCounter;
+                if (authProvider.Authenticate(model, out msg, out attemptCounter))
                 {
                     Logger.Log.InfoFormat("User {0} Authenticate succesful", model.Login);
                     return RedirectToAction("List", "Client");
-                    //return Redirect(Url.Action("List", "Client"));
                 }
                 else
                 {
                     ModelState.AddModelError("", msg); //"Login or Pasword incorrect"
                     Logger.Log.Error(msg);
+
+                    // Send mail notification
+                    if (attemptCounter == 5)
+                    {
+                        var user = Repository.GetUserByLogin(model.Login);
+                        if (null != user)
+                        {
+                            mailProvider.SendNotify("UserBlocked", user.Email,
+                                subject => string.Format(subject, HostName),
+                                body => string.Format(body,
+                                    Url.Action("Confirm", "User", new {Token = user.Guid}), HostName));
+
+                            msg = "Email sent";
+                            ModelState.AddModelError("", msg);
+                            Logger.Log.Error(msg);
+                        }
+                    }
                     return View();
                 }
             }
@@ -179,28 +203,126 @@ namespace Banking.Controllers
             return Redirect(Url.Action("Index", "Home"));
         }
 
-        //[Authorize]
-        //public ActionResult SubscriptionTest()
+       // [HttpPost]
+       // [AllowAnonymous]
+       //// [ValidateAntiForgeryToken]
+       // public async Task<ActionResult> Register(UserRegisterView model)
+       // {
+       //     Logger.Log.DebugFormat("User.Register() [HttpPost]. Email {0}", model.Email.ToString());
+       //     if (ModelState.IsValid)
+       //     {
+       //         var user = new UserRegisterView() { Login = model.Login };
+       //         user.Email = model.Email;
+       //         //user.ConfirmedEmail = false;
+       //         //var result = await UserManager.CreateAsync(user, model.Password);
+       //         //if (result.Succeeded)
+       //         {
+       //             // наш email с заголовком письма
+       //             MailAddress from = new MailAddress("somemail@yandex.ru", "Web Registration");
+       //             // кому отправляем
+       //             MailAddress to = new MailAddress(user.Email);
+       //             // создаем объект сообщения
+       //             MailMessage m = new MailMessage(from, to);
+       //             // тема письма
+       //             m.Subject = "Email confirmation";
+       //             // текст письма - включаем в него ссылку
+       //             m.Body = string.Format("Для завершения регистрации перейдите по ссылке:" +
+       //                             "<a href=\"{0}\" title=\"Подтвердить регистрацию\">{0}</a>",
+       //                 Url.Action("ConfirmEmail", "Account", new { Token = user.Login, Email = user.Email }, Request.Url.Scheme));
+       //             m.IsBodyHtml = true;
+       //             // адрес smtp-сервера, с которого мы и будем отправлять письмо
+       //             SmtpClient smtp = new System.Net.Mail.SmtpClient("smtp.yandex.ru", 25);
+       //             // логин и пароль
+       //             smtp.Credentials = new System.Net.NetworkCredential("somemail@yandex.ru", "password");
+       //             smtp.Send(m);
+                    
+       //         }
+
+       //     }return RedirectToAction("List", "Client", new { Email = model.Email });
+       //     //return System.Web.UI.WebControls.View(model);
+       // }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public ViewResult ConfirmEmail(string msg, string login)
+        {
+            ViewBag.Msg = msg;
+            ViewBag.UserLogin = login;
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public ViewResult ConfirmEmail(string UserLogin)
+        {
+            var login = ViewBag.UserLogin;
+            var user = Repository.GetUserByLogin(UserLogin);
+            if (null != user)
+            {
+                mailProvider.SendNotify("Register", user.Email,
+                    subject => string.Format(subject, HostName),
+                    body => string.Format(body,
+                        Url.Action("ConfirmAndUnblock", "User", new { Token = user.Guid },
+                            Request.Url.Scheme), HostName));
+
+                ViewBag.Msg = "Email was sent";
+            }
+            return View();
+        }
+
+
+        //[AllowAnonymous]
+        //public RedirectToRouteResult Confirm(string token, string email)
         //{
-        //    var mailController = new MailController();
+        //    Logger.Log.DebugFormat("User.Confirm(). Token {0}, Email {1}", token, email);
+        //    string str = "Error";
+        //    var user = Repository.GetUserByGuid(token);
 
-        //    var email = mailController.Subscription("Привет, мир!", CurrentUser.Email);
-        //    email.Deliver();
-        //    return Content("OK");
-        //}
-
-        //[Authorize]
-        //public ActionResult SubscriptionShow()
-        //{
-        //    var mailController = new MailController();
-        //    var email = mailController.Subscription("Привет, мир!", CurrentUser.Email);
-
-        //    using (var reader = new StreamReader(email.Mail.AlternateViews[0].ContentStream))
+        //    if (user != null)
         //    {
-        //        var content = reader.ReadToEnd();
-        //        return Content(content);
+        //        if (user.Email.Trim() == email)
+        //        {
+        //            user.isConfirmedEmail = true;
+        //            Repository.UpdateUser(user);
+
+        //            str = "Success. You can login now.";
+        //        }
+        //        else
+        //        {
+        //            str = "Token does not match email. Please register again.";                   
+        //        }
+        //        return RedirectToAction("ConfirmEmail", "User", new { msg = str, login = user.Login });
         //    }
-        //    return null;
+        //    else
+        //    {
+        //        str = "Wrong token. Please register again.";
+        //        return RedirectToAction("ConfirmEmail", "User", new { msg = str });
+        //    }
         //}
+
+        // Called from email reference
+        [AllowAnonymous]
+        public RedirectToRouteResult ConfirmAndUnblock(string token)
+        {
+            Logger.Log.DebugFormat("User.ConfirmAndUnblock(). Token {0}", token);
+            string str, strLogin = null;
+            
+            var user = Repository.GetUserByGuid(token);
+
+            if (user != null)
+            {
+                user.isConfirmedEmail = true;
+                user.IsBlock = false;
+                Repository.UpdateUser(user);
+
+                strLogin = user.Login;
+                str = "Success. You can login now.";
+            }
+            else
+            {
+                str = "Wrong token. Where did you got it? Please register again.";
+            }
+           return RedirectToAction("ConfirmEmail", "User", new { msg = str, login =  strLogin });        
+        }
     }
 }

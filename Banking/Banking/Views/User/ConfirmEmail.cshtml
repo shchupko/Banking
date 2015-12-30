@@ -1,0 +1,20 @@
+﻿@model Banking.Domain.Models.ViewModels.UserRegisterView
+
+@{
+    //  ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("ConfirmEmail", "User", FormMethod.Post))
+{
+    <h4>@ViewBag.Msg</h4>
+
+    <div>
+        @if (ViewBag.UserLogin != null)
+        {
+            <input type="submit" value="Send Email again" class="btn"/>
+        }
+        @Html.ActionLink("Go to Login page", "Login", null, null, new {@class = "btn"})
+    </div>
+}
+

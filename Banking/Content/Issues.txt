@@ -1,0 +1,8 @@
+
+22.12.15
+- How to change View if controllers func caled from JS.
+- UT
+	- [SetUpFixture] don't called. NUnit ver ? 
+		A lot of time was spend for understand then "OneTimeSetUp methods may be async if running under .NET 4.0 or higher."
+	- DependencyResolver.Current.GetService<IAuthProvider>(); Exception = {"The request lifetime scope cannot be created because the HttpContext is not available."}
+	

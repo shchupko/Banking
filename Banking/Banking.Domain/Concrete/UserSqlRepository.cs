@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using Banking.Domain.Abstract;
+using Banking.Domain.Mail;
+using Ninject.Activation;
 
 namespace Banking.Domain.Concrete
 {
     public class UserSqlRepository : IUserSqlRepository
     {
         public BankingDbDataContext Db;
+        INotifyMail mailProvider;
 
-        public UserSqlRepository(BankingDbDataContext db = null)
+        public UserSqlRepository(BankingDbDataContext db = null, INotifyMail mail = null)
         {
             if (db == null)
             {
@@ -20,6 +23,8 @@ namespace Banking.Domain.Concrete
             {
                 Db = db;
             }
+
+            mailProvider = mail;
         }
 
         public IEnumerable<User> Users
@@ -27,10 +32,11 @@ namespace Banking.Domain.Concrete
             get { return Db.Users; }
         }
 
-        public static string GetActivateUrl()
+        public static string GetGuid()
         {
             return Guid.NewGuid().ToString("N");
         }
+
         public bool CreateUser(User instance)
         {
             if (instance.Id == 0)
@@ -38,7 +44,8 @@ namespace Banking.Domain.Concrete
                 instance.RegDate = DateTime.Now;
                 instance.AttemptCounter = 0;
                 instance.IsBlock = false;
-                //instance.ActivatedLink = GetActivateUrl(); todo
+                instance.Guid = GetGuid(); 
+                instance.isConfirmedEmail = false;
                 Db.Users.InsertOnSubmit(instance);
                 Db.Users.Context.SubmitChanges();
                 return true;
@@ -73,7 +80,7 @@ namespace Banking.Domain.Concrete
             return false;
         }
 
-        public User GetUser(string login)
+        public User GetUserByLogin(string login)
         {
             return Db.Users.FirstOrDefault(p => string.Compare(p.Login, login, true) == 0);
         }
@@ -83,31 +90,42 @@ namespace Banking.Domain.Concrete
             return Db.Users.FirstOrDefault(p => string.Compare(p.Email, email, true) == 0);
         }
 
+        public User GetUserByGuid(string guid)
+        {
+            return Db.Users.FirstOrDefault(p => string.Compare(p.Guid, guid, true) == 0);
+        }
+
         [HandleError( View = "Error")]
-        public bool Login(string login, string password, out string msg)
+        public bool Login(string login, string password, out string msg, out int attemptCounter)
         {
             bool retVal = false;
             msg = null;
+            attemptCounter = 0;
             User user = Db.Users.FirstOrDefault(p => string.Compare(p.Login, login, true) == 0);// && p.Password == password);
             if (user == null)
             {
-                //msg = string.Format("User {0} don't found!", login);
+                msg = string.Format("User {0} don't found!", login);
                 Logger.Log.InfoFormat("User {0} don't found!", login);
             }
             else
             {
-                int attemptCounter = user.AttemptCounter ?? 0;
-                if (user.IsBlock ?? false)
+                attemptCounter = user.AttemptCounter ?? 0;
+                if (user.IsBlock)
                 {
                     msg = string.Format("User {0} is bloked!", user.Login);
                     attemptCounter++;
+                }
+                else if (!user.isConfirmedEmail)
+                {
+                    msg = string.Format("Please confirm email.");
+                    Logger.Log.DebugFormat("UserSqlRepository.Login(). User {0} try login with unconfirmed Email {1}", user.Login, user.Email);
                 }
                 else if (user.Password.Trim() != password)
                 {
                     if (attemptCounter++ > 4)
                     {
                         user.IsBlock = true;
-                        msg = string.Format("User {0} bloked! Send email.", user.Login);
+                        msg = string.Format("User {0} bloked!", user.Login);
                     }
                     else
                     {

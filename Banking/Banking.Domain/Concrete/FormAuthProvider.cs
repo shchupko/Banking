@@ -26,7 +26,7 @@ namespace Banking.Domain.Concrete
         }
 
 
-        public bool Authenticate(UserLoginView model, out string msg)
+        public bool Authenticate(UserLoginView model, out string msg, out int attemptCounter)
         {
             bool result = FormsAuthentication.Authenticate(model.Login, model.Password);
             if (result)
@@ -34,7 +34,7 @@ namespace Banking.Domain.Concrete
                 FormsAuthentication.SetAuthCookie(model.Login, model.RememberMe);
             }
 
-            if (Repository.Login(model.Login, model.Password, out msg))
+            if (Repository.Login(model.Login, model.Password, out msg, out attemptCounter))
             {
                 FormsAuthentication.SetAuthCookie(model.Login, model.RememberMe);
                 //CreateCookie(model.Login, false);
@@ -93,7 +93,7 @@ namespace Banking.Domain.Concrete
         //                if (authCookie != null && !string.IsNullOrEmpty(authCookie.Value))
         //                {
         //                    var ticket = FormsAuthentication.Decrypt(authCookie.Value);
-        //                    _currentUser = Repository.GetUser(ticket.Name);// new UserProvider(ticket.Name, Repository);
+        //                    _currentUser = Repository.GetUserByLogin(ticket.Name);// new UserProvider(ticket.Name, Repository);
         //                }
         //                else
         //                {

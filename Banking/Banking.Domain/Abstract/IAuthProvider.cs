@@ -12,7 +12,7 @@ namespace Banking.Domain.Abstract
     {
         //User CurrentUser { get; }        
         //HttpContext HttpContext { get; set; }
-        bool Authenticate(UserLoginView model, out string msg);
+        bool Authenticate(UserLoginView model, out string msg, out int attemptCounter);
         void SignOut();
 
     }

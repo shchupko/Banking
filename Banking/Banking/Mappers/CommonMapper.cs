@@ -16,12 +16,14 @@ namespace Banking.Mappers
                     .ForMember(dest => dest.Login, opt => opt.MapFrom(src => src.Login))
                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
                     .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Lastname))
-                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                    .ForMember(dest => dest.SkipEmailConfirmation, opt => opt.MapFrom(src => src.isConfirmedEmail));
             Mapper.CreateMap<UserRegisterView, User>()
                    .ForMember(dest => dest.Login, opt => opt.MapFrom(src => src.Login))
                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password))
                     .ForMember(dest => dest.Lastname, opt => opt.MapFrom(src => src.Address))
-                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+                    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                    .ForMember(dest => dest.isConfirmedEmail, opt => opt.MapFrom(src => src.SkipEmailConfirmation));
 
         }
 

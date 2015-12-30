@@ -25,6 +25,8 @@ namespace Banking.Domain.Models.ViewModels
 
         [Required(ErrorMessage = "Enter Captcha")]
         public string Captcha { get; set; }
+
+        public bool SkipEmailConfirmation { get; set; }
     }
 
     public class UserLoginView
@@ -36,6 +38,7 @@ namespace Banking.Domain.Models.ViewModels
         public string Password { get; set; }
 
         public bool RememberMe { get; set; }
+
     }
 
     public class ForgotPasswordView

@@ -82,14 +82,18 @@ namespace Banking.Controllers
             else if (action.Contains("Edit"))
             {
                 var id = action.Split('=');
-
                 var client = clients.First(c => c.ContactNumber == int.Parse(id[1]));
 
                 //return View("Person", client); work with Button but no with JS.???
-                //return View("Person", client);
-                return RedirectToAction("Person", "Client", client);
-                //return null;
+                return View("Person", client);
+                //return RedirectToAction("Person", "Client", client);
+            }
+            else if (action.Contains("Print"))
+            {
+                var id = action.Split('=');
+                var client = clients.First(c => c.ContactNumber == int.Parse(id[1]));
 
+                return View("Person", client);//todo
             }
             else
             {
@@ -108,7 +112,7 @@ namespace Banking.Controllers
         [HttpGet]
         public ViewResult Person(Client client)//
         {
-            Logger.Log.Debug("Person()");
+            Logger.Log.Debug("Person() [HttpGet]");
 
             //if (client == null)
             {
@@ -128,7 +132,7 @@ namespace Banking.Controllers
         [HttpPost]
         public RedirectToRouteResult Person(Client client, string action = null)
         {
-            Logger.Log.Debug("Person() Post");
+            Logger.Log.Debug("Person() [HttpPost]");
 
             client.Depo = Request.Form["Deposit"].Equals("false") ? false : true;
 

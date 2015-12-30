@@ -8,12 +8,15 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using Banking.Domain.Mail;
 
 namespace Banking.Controllers
 {
     public abstract class DefaultController : Controller
     {
         public IMapper ModelMapper { get; set; }
+        public INotifyMail mailProvider;
+
         public static string HostName = string.Empty;
 
         protected override void Initialize(System.Web.Routing.RequestContext requestContext)
