@@ -28,40 +28,44 @@ namespace Banking.Controllers
             mailProvider = mail;
         }
 
-        [HttpGet]
-        public ViewResult qtip()
-        {
-            Logger.Log.Debug("User.qtip()");
-            return View("qtip");
-        }
+    [HttpGet]
+    public ViewResult qtip()
+    {
+        Logger.Log.Debug("User.qtip()");
+        return View("qtip");
+    }
 
+    [HttpPost]
+    public RedirectToRouteResult qtip(string login)
+    {
+        Logger.Log.Debug("User.qtip()");
+        return RedirectToAction("Index", "Home");
+    }
 
         [HttpPost]
-        public ActionResult ForgotPassword(ForgotPasswordView user)
+        public ActionResult ForgotPassword(UserLoginView user)
         {
-            Logger.Log.DebugFormat("User.ForgotPassword() [HttpPost] email {0}", user.Email);
+            Logger.Log.DebugFormat("User.ForgotPassword() [HttpPost] Login {0}", user.Login);
 
-            if (string.IsNullOrEmpty(user.Email))
+            if (string.IsNullOrEmpty(user.Login))
             {
                 return View(user);
             }
 
-            var userDb = Repository.GetUserByEmail(user.Email);
+            var userDb = Repository.GetUserByLogin(user.Login);
 
             if (null == userDb)
             {
-                string msg = "Email absent in DB: " + user.Email;
+                string msg = "User " + user.Login + " absent in DB.";
                 ModelState.AddModelError("Login", msg);
             }
             else
             {
-                var mail = new NotifyMail();
-
                 mailProvider.SendNotify("ForgotPassword", userDb.Email,
                     subject => string.Format(subject, HostName),
                     body => string.Format(body, userDb.Login, userDb.Password, HostName));
 
-                ViewBag.Msg = "Email was sent";
+                ViewBag.Msg = "Credentials was sent to user email";
             }
             return View(user);
         }
@@ -71,7 +75,7 @@ namespace Banking.Controllers
         {
             Logger.Log.DebugFormat("User.ForgotPassword() [HttpGet] ");
 
-            var newUser = new ForgotPasswordView();
+            var newUser = new UserLoginView();
             return View(newUser);
         }
 
@@ -147,7 +151,9 @@ namespace Banking.Controllers
         public ViewResult Login()
         {
             Logger.Log.Debug("User.Login() [HttpGet]");
-            return View("Login");
+
+            var user = new UserLoginView();
+            return View("Login", user);
         }
 
         [HttpPost]
@@ -170,8 +176,8 @@ namespace Banking.Controllers
                     ModelState.AddModelError("", msg); //"Login or Pasword incorrect"
                     Logger.Log.Error(msg);
 
-                    // Send mail notification
-                    if (attemptCounter == 5)
+                    // Send mail notification when blocked
+                    if (attemptCounter == model.BlockedAttemptNumber)
                     {
                         var user = Repository.GetUserByLogin(model.Login);
                         if (null != user)
@@ -186,13 +192,13 @@ namespace Banking.Controllers
                             Logger.Log.Error(msg);
                         }
                     }
-                    return View();
+                    return View(model);
                 }
             }
             else
             {
                 Logger.Log.Warn("Credantials don't valid");
-                return View("Login");
+                return View(model);
             }
         }
 
@@ -218,7 +224,7 @@ namespace Banking.Controllers
        //         //if (result.Succeeded)
        //         {
        //             // наш email с заголовком письма
-       //             MailAddress from = new MailAddress("somemail@yandex.ru", "Web Registration");
+       //             MailAddress from = new MailAddress("somemail@gmail.com", "Web Registration");
        //             // кому отправляем
        //             MailAddress to = new MailAddress(user.Email);
        //             // создаем объект сообщения
@@ -231,9 +237,9 @@ namespace Banking.Controllers
        //                 Url.Action("ConfirmEmail", "Account", new { Token = user.Login, Email = user.Email }, Request.Url.Scheme));
        //             m.IsBodyHtml = true;
        //             // адрес smtp-сервера, с которого мы и будем отправлять письмо
-       //             SmtpClient smtp = new System.Net.Mail.SmtpClient("smtp.yandex.ru", 25);
+       //             SmtpClient smtp = new System.Net.Mail.SmtpClient("smtp.gmail.com", 25);
        //             // логин и пароль
-       //             smtp.Credentials = new System.Net.NetworkCredential("somemail@yandex.ru", "password");
+        //             smtp.Credentials = new System.Net.NetworkCredential("somemail@gmail.com", "password");
        //             smtp.Send(m);
                     
        //         }
@@ -246,6 +252,7 @@ namespace Banking.Controllers
         [HttpGet]
         public ViewResult ConfirmEmail(string msg, string login)
         {
+            Logger.Log.DebugFormat("ConfirmEmail({0}) [HttpGet]", login);
             ViewBag.Msg = msg;
             ViewBag.UserLogin = login;
             return View();
@@ -253,53 +260,37 @@ namespace Banking.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public ViewResult ConfirmEmail(string UserLogin)
+        public ViewResult ConfirmEmail(string login)
         {
-            var login = ViewBag.UserLogin;
-            var user = Repository.GetUserByLogin(UserLogin);
-            if (null != user)
-            {
-                mailProvider.SendNotify("Register", user.Email,
-                    subject => string.Format(subject, HostName),
-                    body => string.Format(body,
-                        Url.Action("ConfirmAndUnblock", "User", new { Token = user.Guid },
-                            Request.Url.Scheme), HostName));
+            Logger.Log.DebugFormat("ConfirmEmail({0}) [HttpPost]", login);
 
-                ViewBag.Msg = "Email was sent";
+            var nameValueCollection = HttpUtility.ParseQueryString(Request.UrlReferrer.Query);
+            login = nameValueCollection["login"];
+            if (string.IsNullOrEmpty(login))
+            {
+                ViewBag.Msg = "Have not Login.";
             }
-            return View();
+            else
+            {
+                var user = Repository.GetUserByLogin(login);
+                if (null != user)
+                {
+                    mailProvider.SendNotify("Register", user.Email,
+                        subject => string.Format(subject, HostName),
+                        body => string.Format(body,
+                            Url.Action("ConfirmAndUnblock", "User", new {Token = user.Guid.Trim()},
+                                Request.Url.Scheme), HostName));
+
+                    ViewBag.Msg = "Email was sent";
+                    ViewBag.UserLogin = user.Login;
+                }
+            }
+            var userView = new UserLoginView();
+            userView.Login = login;
+            return View(userView);
         }
 
-
-        //[AllowAnonymous]
-        //public RedirectToRouteResult Confirm(string token, string email)
-        //{
-        //    Logger.Log.DebugFormat("User.Confirm(). Token {0}, Email {1}", token, email);
-        //    string str = "Error";
-        //    var user = Repository.GetUserByGuid(token);
-
-        //    if (user != null)
-        //    {
-        //        if (user.Email.Trim() == email)
-        //        {
-        //            user.isConfirmedEmail = true;
-        //            Repository.UpdateUser(user);
-
-        //            str = "Success. You can login now.";
-        //        }
-        //        else
-        //        {
-        //            str = "Token does not match email. Please register again.";                   
-        //        }
-        //        return RedirectToAction("ConfirmEmail", "User", new { msg = str, login = user.Login });
-        //    }
-        //    else
-        //    {
-        //        str = "Wrong token. Please register again.";
-        //        return RedirectToAction("ConfirmEmail", "User", new { msg = str });
-        //    }
-        //}
-
+    
         // Called from email reference
         [AllowAnonymous]
         public RedirectToRouteResult ConfirmAndUnblock(string token)

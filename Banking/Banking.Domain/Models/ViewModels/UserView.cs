@@ -6,10 +6,10 @@ using System.Web;
 
 namespace Banking.Domain.Models.ViewModels
 {
-    public class UserRegisterView
+    public class UserRegisterView : BaseView
     {
         [Required(ErrorMessage = "Enter Login")]
-        public string Login { get; set; }        
+        public string Login { get; set; }
 
         [Required(ErrorMessage = "Enter Password")]
         public string Password { get; set; }
@@ -29,11 +29,12 @@ namespace Banking.Domain.Models.ViewModels
         public bool SkipEmailConfirmation { get; set; }
     }
 
-    public class UserLoginView
+    public class UserLoginView : BaseView
     {
         [Required(ErrorMessage = "Enter Login")]
         public string Login { get; set; }
 
+        //s[Display(Name = "Date published")]
         [Required(ErrorMessage = "Enter Password")]
         public string Password { get; set; }
 
@@ -41,9 +42,10 @@ namespace Banking.Domain.Models.ViewModels
 
     }
 
-    public class ForgotPasswordView
+    public class BaseView
     {
-        [Required(ErrorMessage = "Enter email")]
-        public string Email { get; set; }
+        public int minL = 4;
+        public int maxL = 8;
+        public int BlockedAttemptNumber = 5;
     }
 }

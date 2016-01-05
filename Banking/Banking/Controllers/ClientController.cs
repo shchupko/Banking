@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -9,6 +11,8 @@ using System.Web.Mvc;
 using Banking.Domain.Abstract;
 using System.Web.Helpers;
 using Banking.Domain;
+using System.Drawing;
+using System.Drawing.Printing;
 
 namespace Banking.Controllers
 {
@@ -93,6 +97,8 @@ namespace Banking.Controllers
                 var id = action.Split('=');
                 var client = clients.First(c => c.ContactNumber == int.Parse(id[1]));
 
+                Print("test");
+
                 return View("Person", client);//todo
             }
             else
@@ -105,7 +111,45 @@ namespace Banking.Controllers
             return View(clientsPage);
         }
 
+        public void Print(string source)
+        {
+            string s = "Hello"; // device-dependent string, need a FormFeed?
 
+            //// Allow the user to select a printer.
+            //PrintDialog pd = new PrintDialog();
+            //pd.PrinterSettings = new PrinterSettings();
+            //if (DialogResult.OK == pd.ShowDialog(this))
+            //{
+            //    // Send a printer-specific to the printer.
+            //    RawPrinterHelper.SendStringToPrinter(pd.PrinterSettings.PrinterName, s);
+            //}
+
+            //PrintDialog printDialog = new PrintDialog();
+            //string filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "FlowDocument1.xaml");
+
+            //if (printDialog.ShowDialog() == true)
+            //{
+            //    PrintQueue queue = printDialog.PrintQueue;
+            //    XpsDocumentWriter writer = PrintQueue.CreateXpsDocumentWriter(queue);
+
+            //    using (FileStream fs = File.Open(filePath, FileMode.Open))
+            //    {
+            //        FlowDocument flowDocument = (FlowDocument)XamlReader.Load(fs);
+            //        writer.Write(((IDocumentPaginatorSource)flowDocument).DocumentPaginator);
+            //    }
+            //}
+            var x = new PrintDocument();
+    x.PrintPage += new PrintPageEventHandler(PrintPage);
+    x.Print();
+}
+private void PrintPage(Object sender, PrintPageEventArgs e)
+{
+    var textToPrint = "Hello world";
+    var printFont = new Font("Courier New", 12);
+    var leftMargin = e.MarginBounds.Left;
+    var topMargin = e.MarginBounds.Top;
+    e.Graphics.DrawString(textToPrint, printFont, Brushes.Black, leftMargin, topMargin);
+}
 
         // grid.HasSelection showed rendering
         [Authorize]

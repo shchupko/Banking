@@ -14,8 +14,9 @@
         @Html.TextBoxFor(x => x.Login, "Login", new { required = "required", placeholder = "John" })
         <br>
         <label for="Password">Password</label>
-        @Html.TextBoxFor(x => x.Password, "Password", new { required = "required", type = "password", MinLengthAttributeAdapter = 3, MaxLengthAttributeAdapter = 16 })
+        @Html.TextBoxFor(x => x.Password, "Password", new { required = "required", type = "password", minlength = Model.minL, maxlength = Model.maxL })
         <br>
+        @*@Html.EditorFor(m => m.Password)*@
 
         <p>
             @Html.CheckBox("RememberMe", true)Remember me

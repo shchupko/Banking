@@ -37,7 +37,7 @@ namespace Banking.Controllers
         {
             Logger.Log.Debug("HomeController.ThrowException()");
 
-            throw new HttpException(403, "Доступ запрещён!");
+            throw new HttpException(403, "Throw Exception");
 
             return View();
         }

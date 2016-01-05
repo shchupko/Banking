@@ -27,7 +27,9 @@ CREATE TABLE Users
     [Cookies] NCHAR(100) NULL, 
 	[AttemptCounter] INT NULL, 
 	[RegDate] DATETIME NULL, 
-    [IsBlock] BIT NOT NULL
+    [IsBlock] BIT NOT NULL,
+	[isConfirmedEmail] BIT NOT NULL,
+	[Guid] NCHAR(100) NULL
 )
 
 INSERT INTO Users( Login, Password) 

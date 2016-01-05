@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.Mvc;
 using Banking.Domain.Abstract;
 using Banking.Domain.Mail;
+using Banking.Domain.Models.ViewModels;
 using Ninject.Activation;
 
 namespace Banking.Domain.Concrete
@@ -122,7 +123,8 @@ namespace Banking.Domain.Concrete
                 }
                 else if (user.Password.Trim() != password)
                 {
-                    if (attemptCounter++ > 4)
+                    var blockedAttemptNumber = new UserLoginView().BlockedAttemptNumber;
+                    if (attemptCounter++ >= blockedAttemptNumber)
                     {
                         user.IsBlock = true;
                         msg = string.Format("User {0} bloked!", user.Login);

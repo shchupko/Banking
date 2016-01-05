@@ -13,7 +13,11 @@
     <title>List</title>
 </head>
 
-
+<a href="#" onclick="window.print(); return false;">Print</a> 
+<input type="button"
+       onclick="window.print()"
+       value="Print This Page" />
+<a href="javascript:window.print()">Print This Page</a>
 
 <body>
 <div style="text-align:right;">
@@ -33,6 +37,14 @@
         function OnComplete(request, status) {
             alert("Статус запроса : " + status);
         }
+
+        $(document).ready(function () {
+            $('ul#tools').prepend('<li class="print"><a href="#print">Click me to print</a></li>');
+            $('ul#tools li.print a').click(function () {
+                window.print();
+                return false;
+            });
+        });
     </script>
 
     @using (Ajax.BeginForm("ListQuery", new AjaxOptions

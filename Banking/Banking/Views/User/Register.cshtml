@@ -11,18 +11,18 @@
     @*@Html.ValidationSummary()*@
     <div>
         <label for="Login">Login<em>*</em></label>
-        @Html.TextBox("Login", Model.Login, new { required = "required", placeholder = "John" })
+        @Html.TextBox("Login", Model.Login, new { required = "required", minlength = Model.minL, maxlength = Model.maxL, placeholder = "John" })
 
         <errormsg>
             @Html.ValidationMessage("Login")
         </errormsg><br>
 
         <label for="Password">Password<em>*</em></label>
-        @Html.TextBox("Password", Model.Login, new { required = "required", type = "password", minlength = 4, maxlength = 8 })
+        @Html.TextBox("Password", Model.Login, new { required = "required", type = "password", minlength = Model.minL, maxlength = Model.maxL })
         <errormsg> @Html.ValidationMessage("Password") </errormsg><br>
 
         <label for="ConfirmPassword">Confirm Password<em>*</em></label>
-        @Html.TextBox("ConfirmPassword", Model.Login, new { required = "required", type = "password" })
+        @Html.TextBox("ConfirmPassword", Model.Login, new { required = "required", type = "password", minlength = Model.minL, maxlength = Model.maxL })
         @Html.ValidationMessage("ConfirmPassword")<br>
 
         <label for="Email">Email<em>*</em></label>
@@ -38,7 +38,7 @@
         @Html.TextBox("Captcha", Model.Captcha, new { type = "number", placeholder = "Enter picture text" })
         @Html.ValidationMessage("Captcha")<br>
 
-        @Html.CheckBox("SkipEmailConfirmation", true) Skip email confirmation<br/>
+        @Html.CheckBox("SkipEmailConfirmation", false) Skip email confirmation<br/>
 
         <input type="submit" value="Register" class="btn" />
         @Html.ActionLink("Cancel", "Login", null, null, new { @class = "btn" })
