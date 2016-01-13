@@ -2,14 +2,14 @@
 using System.Collections.Specialized;
 using System.Web;
 using Moq;
-using Ninject;
+
 
 
 namespace Banking.Tests.Mock.Http
 {
     public class MockHttpContext : Mock<HttpContextBase>
     {
-        [Inject]
+        //[Inject]
         public HttpCookieCollection Cookies { get; set; }
 
         public MockHttpCachePolicy Cache { get; set; }

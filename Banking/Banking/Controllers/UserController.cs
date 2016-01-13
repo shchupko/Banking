@@ -28,19 +28,19 @@ namespace Banking.Controllers
             mailProvider = mail;
         }
 
-    [HttpGet]
-    public ViewResult qtip()
-    {
-        Logger.Log.Debug("User.qtip()");
-        return View("qtip");
-    }
+[HttpGet]
+public ViewResult qtip()
+{
+    Logger.Log.Debug("User.qtip()");
+    return View("qtip");
+}
 
-    [HttpPost]
-    public RedirectToRouteResult qtip(string login)
-    {
-        Logger.Log.Debug("User.qtip()");
-        return RedirectToAction("Index", "Home");
-    }
+[HttpPost]
+public RedirectToRouteResult qtip(string login)
+{
+    Logger.Log.Debug("User.qtip()");
+    return RedirectToAction("Index", "Home");
+}
 
         [HttpPost]
         public ActionResult ForgotPassword(UserLoginView user)
@@ -104,6 +104,9 @@ namespace Banking.Controllers
             {
                 ModelState.AddModelError("Login", "This Login is already registered");
             }
+
+            // [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Entered mobile format is not valid.")]
+            // todo validate phone
 
             if (ModelState.IsValid)
             {

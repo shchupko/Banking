@@ -1,9 +1,4 @@
 
-CREATE TABLE sizes
-(
-    name varchar(10) NOT NULL CHECK (name IN('small', 'medium', 'large'))
-)
-
 use BankingDb
 CREATE TABLE Clients
 (

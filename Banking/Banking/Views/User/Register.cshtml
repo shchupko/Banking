@@ -1,17 +1,32 @@
 ﻿@model Banking.Domain.Models.ViewModels.UserRegisterView
 
+@*@Html.Partial("Qtip")*@
+<script src="~/Scripts/Custom.js" type="text/javascript"></script>
+
 @{
   //  ViewBag.Title = "Register";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@using (Html.BeginForm("Register", "User", FormMethod.Post))
-{
-    <h4>Please type next data:</h4>    
+<!--стиль для ошибок-->
+<style>
+    input.error {
+        background: red;
+    }
+
+    input.valid {
+        background: green;
+    }
+</style>
+
+@*@using (Html.BeginForm("Register", "User", FormMethod.Post))*@
+<form action="Register" method="post" id="register_form" @*name="form_reg"*@>
+    <h4>Please type next data:</h4>
     @*@Html.ValidationSummary()*@
     <div>
-        <label for="Login">Login<em>*</em></label>
+        <label for="Login">Login</label>
         @Html.TextBox("Login", Model.Login, new { required = "required", minlength = Model.minL, maxlength = Model.maxL, placeholder = "John" })
+        <label for="Login"><em>*</em></label>
 
         <errormsg>
             @Html.ValidationMessage("Login")
@@ -23,10 +38,12 @@
 
         <label for="ConfirmPassword">Confirm Password<em>*</em></label>
         @Html.TextBox("ConfirmPassword", Model.Login, new { required = "required", type = "password", minlength = Model.minL, maxlength = Model.maxL })
-        @Html.ValidationMessage("ConfirmPassword")<br>
+        <p>
+            @Html.ValidationMessage("ConfirmPassword")
+        </p>
 
         <label for="Email">Email<em>*</em></label>
-        @Html.TextBox("Email", Model.Email, new { required = "required", type = "email" })
+        @Html.TextBox("Email", Model.Email, new { required = "required", type = "email", Value = "smart358@ukr.net" })
         @Html.ValidationMessage("Email")<br>
 
         <label for="Address">Address</label>
@@ -38,9 +55,9 @@
         @Html.TextBox("Captcha", Model.Captcha, new { type = "number", placeholder = "Enter picture text" })
         @Html.ValidationMessage("Captcha")<br>
 
-        @Html.CheckBox("SkipEmailConfirmation", false) Skip email confirmation<br/>
+        @Html.CheckBox("SkipEmailConfirmation", false) Skip email confirmation<br />
 
-        <input type="submit" value="Register" class="btn" />
+        <input type="submit" value="Register" class="btn" id="subm_id" />
         @Html.ActionLink("Cancel", "Login", null, null, new { @class = "btn" })
 </div>
-}
+</form>

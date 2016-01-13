@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using Banking.Domain.Abstract;
 using Banking.Domain.Mail;
 using Banking.Domain.Models.ViewModels;
-using Ninject.Activation;
 
 namespace Banking.Domain.Concrete
 {
@@ -46,7 +45,6 @@ namespace Banking.Domain.Concrete
                 instance.AttemptCounter = 0;
                 instance.IsBlock = false;
                 instance.Guid = GetGuid(); 
-                instance.isConfirmedEmail = false;
                 Db.Users.InsertOnSubmit(instance);
                 Db.Users.Context.SubmitChanges();
                 return true;

@@ -1,8 +1,9 @@
-﻿@{
+﻿
+
+@{
+  //  ViewBag.Title = "Register";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-
 <!--стиль для ошибок-->
 <style>
     input.error,
@@ -12,10 +13,7 @@
         border: 1px solid red !important;
     }
 
-    input[type='text'].error {
-        border: 1px solid #e1e1e1;
-        border-top: 1px solid #b0aa9b;
-        border-left: 1px solid #b0aa9b;
+    input.error {
         background: #ff9582;
     }
 </style>
@@ -66,7 +64,7 @@
 
 	jQuery.validator.addMethod("pass", function(value, element)
 	{
-		if((/^[a-zA-Z\d\-\!\.\/\$\\\,\?\:\&\*\;\@@\%\(\)\+\=\№\#\_\[\]]{6,}$/.test(value)))
+		if((/^[a-zA-Z\d\-\!\.\/\$\\\,\?\:\&\*\;\%\(\)\+\=\№\#\_\[\]]{6,}$/.test(value)))
 		{
 			return true;
 		}
@@ -136,7 +134,7 @@
 		users_password : function() {
 			$('*[name="users_password"]').qtip({
 				content: {
-					text: 'Для поля "Пароль" допускается ввод чисел от 0 до 9, а также букв латинского алфавита и символов "-!./\$,?:&*;@@%()+=№#_[]"',
+					text: 'Для поля "Пароль" допускается ввод чисел от 0 до 9, а также букв латинского алфавита и символов "-!./\$,?:&*;%()+=№#_[]"',
 					title: {
 						text: 'Пароль'
 					}
@@ -233,7 +231,7 @@ function changeTip(element)
 
 
 <form action="" method="post" id="register_form" name="form_reg">
-    Логин: <input title="" name="users_login" type="text" /></br>
-    Пароль: <input name="users_password" type="password" /></br>
-    <input name="submit_f" id="subm_id" type="button" value="Submit" />
+    <p> Логин: <input title="" name="users_login" type="text" /><br></p>
+    <p> Пароль: <input name="users_password" type="password" /></br></p>
+    <p><input name="submit_f" id="subm_id" type="button" value="Зарегистрироваться" /></p>
 </form>

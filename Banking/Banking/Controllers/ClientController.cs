@@ -72,6 +72,12 @@ namespace Banking.Controllers
                 {
                     action = "Edit=" + v;
                 }
+
+                v = Request["Delete"]; 
+                if (v != null)
+                {
+                    action = "Delete=" + v;
+                }
             }
 
             if (action.Contains("Delete"))
