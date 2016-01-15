@@ -6,17 +6,17 @@ using Banking.Domain;
 using Banking.Domain.Abstract;
 using Banking.Domain.Concrete;
 using Banking.Mappers;
-using Banking.Tests.Mock;
+using Banking.UnitTests.Mock;
 using Moq;
 using NUnit.Framework;
 
 
-namespace Banking.Tests.Setup
+namespace Banking.UnitTests.Setup
 {
     [TestFixture] //???
     public class UnitTestSetupFixture
     {
-        [OneTimeSetUp]
+        [SetUp]
         public virtual void Setup()
         {
             Console.WriteLine("=====START=====");
@@ -24,7 +24,7 @@ namespace Banking.Tests.Setup
             ConfigureContainer();
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public virtual void TearDown()
         {
             Console.WriteLine("=====FINISH======");

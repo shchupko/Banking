@@ -12,7 +12,7 @@ using Banking.Domain.Abstract;
 using System.Web.Helpers;
 using Banking.Domain;
 using System.Drawing;
-using System.Drawing.Printing;
+
 
 namespace Banking.Controllers
 {
@@ -236,13 +236,6 @@ private void PrintPage(Object sender, PrintPageEventArgs e)
 
             var clients = Repository.Clients.ToList();
 
-            //string s = Request["sort"];
-            //string d = Request["sortdir"];
-            //if (s != null && d != null)
-            //{
-            //    sort = s;
-            //    sortDir = d;
-            //}
             //    string v = Request["Edit"];
             //    if (v != null)
             //    {

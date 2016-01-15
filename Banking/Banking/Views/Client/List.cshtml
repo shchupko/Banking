@@ -22,19 +22,6 @@
 <a href="javascript:window.print()">Print This Page</a>*@
 
 <body>
-     @*onload="Init();">
-    <div id="context-menu-bkg" style="display: none;"></div>
-    <div id="context" class="context-menu">
-        <div class="menu-item allow-hover" onclick="alert('Add a Note'); HideContextMenu();">Add a Note</div>
-        <div class="menu-item allow-hover" onclick="alert('Add a Due Date'); HideContextMenu();">Add a Due Date</div>
-        <div class="menu-item disabled">Mark as Completed</div>
-        <div class="separator-line"></div>
-        <div class="menu-item allow-hover" onclick="alert('Indent Row'); HideContextMenu();">Indent Row</div>
-        <div class="menu-item allow-hover" onclick="alert('Outdent Row'); HideContextMenu();">Outdent Row</div>
-        <div class="menu-item allow-hover" onclick="alert('Delete Row'); HideContextMenu();">Delete Row</div>
-    </div>
-    <div id="right-click-controller" style="height: 100px; width: 300px; border: 1px solid #999; padding: 10px">right click here</div>*@
-
 
     @using (Ajax.BeginForm("ListQuery", new AjaxOptions
     {
@@ -120,53 +107,29 @@
 
 
         <table class="footerText">
-            <td>
-                <button name="action" value="New">Create New Client</button>
+            <tr>
+                <td>
+                    <button name="action" value="New">Create New Client</button>
 
-                @if (ViewBag.OnlyVip == "true" || ViewBag.isFiltered == "true")
-                {
-                    <button name="action" value="ShowAll">Show All</button>
-                }
-                else
-                {
-                    <button name="action" value="Vip">Show Only Vip</button>
-                }
-            </td>
-            <td class="rightcol">
-                Total count of clients: @Model.TotalRows &nbsp;
-                Count of VIP clients: @Model.VipCount &nbsp;
-                Clients who did Deposit: @Model.DepoCount &nbsp;
-            </td>
+                    @if (ViewBag.OnlyVip == "true" || ViewBag.isFiltered == "true")
+                    {
+                        <button name="action" value="ShowAll">Show All</button>
+                    }
+                    else
+                    {
+                        <button name="action" value="Vip">Show Only Vip</button>
+                    }
+                </td>
+                <td class="rightcol">
+                    Total count of clients: @Model.TotalRows &nbsp;
+                    Count of VIP clients: @Model.VipCount &nbsp;
+                    Clients who did Deposit: @Model.DepoCount &nbsp;
+                </td>
+            </tr>
         </table>
     }
 
     <script type="text/javascript">
-
-        //function Init() {
-        //    $("#right-click-controller").rightClick(function (e) {
-        //        $('<div id="overlay" class="overlay" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 100;"></div>').click(function () {
-        //            $(this).remove();
-        //            HideContextMenu();
-        //        }).appendTo(document.body);
-        //        ShowContextMenu(e.pageX, e.pageY);
-        //    });
-        //}
-
-        //function ShowContextMenu(mouseX, mouseY) {
-        //    $('#context').css({ zIndex: '102' }).show();
-        //    $('#context').offset({ top: mouseY, left: mouseX });
-        //    $('#context-menu-bkg').show();
-        //    $('#context-menu-bkg').offset({ top: mouseY, left: mouseX });
-        //    $('#context-menu-bkg').width($('#context').width());
-        //    $('#context-menu-bkg').height($('#context').height());
-        //}
-
-        //function HideContextMenu() {
-        //    $('#context-menu-bkg').hide();
-        //    $('#context').hide();
-        //    $('#overlay').remove();
-        //}
-
 
         //example just
         $(document).ready(function () {

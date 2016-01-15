@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net.Mail;
 
 
-namespace Banking.Tests.Mock
+namespace Banking.UnitTests.Mock
 {
     //public class MockMailSender : Mock<IMailSender> 
     //{

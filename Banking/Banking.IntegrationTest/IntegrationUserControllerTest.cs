@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Autofac.Integration.Mvc;
 using Banking.Controllers;
+using Banking.Domain;
+using Banking.Domain.Abstract;
 using Banking.Domain.Concrete;
+using Banking.Domain.Mail;
 using Banking.Domain.Models.ViewModels;
 using Banking.IntegrationTest.Setup;
-using Banking.Tests.Mock;
-using Banking.Tests.Mock.Http;
-using Banking.Tests.Tools;
+using Banking.Mappers;
+using Banking.CommonTests;
 using Banking.Tools;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
+
 
 namespace Banking.IntegrationTest
 {
@@ -19,25 +23,47 @@ namespace Banking.IntegrationTest
     public class UserControllerTest
     {
         public IntegrationTestSetupFixture Init;
+        public IUserSqlRepository UserRepository;
+        public IAuthProvider AuthProvider;
+        public IMapper Mapper;
+        public INotifyMail NotifyMail;
 
         public UserControllerTest()
         {
             Init = new IntegrationTestSetupFixture();
             Init.Setup();
+
+            var db = new BankingDbDataContext();
+            UserRepository = new UserSqlRepository(db);
+            Mapper = new CommonMapper();
+            AuthProvider = new FormAuthProvider(UserRepository);
+            NotifyMail = new NotifyMail();
+        }
+
+        private string RandomString(int size)
+        {
+            size /= 2;
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random((int)DateTime.Now.Ticks);
+            char ch;
+            for (int i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            var s2 = new string(Enumerable.Range(0, size).Select(_ => (char)random.Next('a', 'z')).ToArray());
+            builder.Append(s2);
+            return builder.ToString();
         }
 
         [Test]
-        public void CreateUserCreateNormalUserCountPlusOne()
+        public void CreateNormalUserCountPlusOne()
         {
-            var db = new MockBankingDbDataContext();   
-            var mockRepository = new UserSqlRepository(db.Object);
-            var controller = new UserController(null, mockRepository, null);
-
-            var countBefore = mockRepository.Users.Count();
+            var controller = new UserController(AuthProvider, UserRepository, Mapper, NotifyMail);
+            var countBefore = UserRepository.Users.Count();
             var httpContext = new MockHttpContext().Object;
 
             var route = new RouteData();
-
             route.Values.Add("controller", "User");
             route.Values.Add("action", "Register");
             route.Values.Add("area", "Default");
@@ -52,54 +78,52 @@ namespace Banking.IntegrationTest
                 Email = "vs@googlemail.com",
                 Password = "123456",
                 ConfirmPassword = "123456",
-                Login = "Name",
-                Address = "addr",
-                Captcha = "1111"
+                Login = RandomString(6),
+                Address = "addr" + RandomString(6),
+                Captcha = "1111",
+                SkipEmailConfirmation = true
             };
 
             ValidatorTool.ValidateObject<UserRegisterView>(registerUserView);
             controller.Register(registerUserView);
 
-            var countAfter = mockRepository.Users.Count();
-            Assert.AreEqual(countBefore + 1, countAfter);
+            var countAfter = UserRepository.Users.Count();
+            Assert.That(countBefore + 1, Is.EqualTo(countAfter));
         }
 
         [Test]
-        public void CreateUserCreate100UsersNoAssert()
+        public void Create100UsersNoAssert()
         {
-        //    var repository = DependencyResolver.Current.GetService<IRepository>();
-        //    var controller =
-        //        DependencyResolver.Current.GetService<LessonProject.Areas.Default.Controllers.UserController>();
+            var controller = new UserController(AuthProvider, UserRepository, Mapper, NotifyMail);
+            var httpContext = new MockHttpContext().Object;
+            
+            var route = new RouteData();
+            route.Values.Add("controller", "User");
+            route.Values.Add("action", "Register");
+            route.Values.Add("area", "Default");
 
-        //    var httpContext = new MockHttpContext().Object;
+            ControllerContext context = new ControllerContext(new RequestContext(httpContext, route), controller);
+            controller.ControllerContext = context;
 
-        //    var route = new RouteData();
+            controller.Session.Add(CaptchaImage.CaptchaValueKey, "1111");
 
-        //    route.Values.Add("controller", "User");
-        //    route.Values.Add("action", "Register");
-        //    route.Values.Add("area", "Default");
-
-        //    ControllerContext context = new ControllerContext(new RequestContext(httpContext, route), controller);
-        //    controller.ControllerContext = context;
-
-        //    controller.Session.Add(CaptchaImage.CaptchaValueKey, "1111");
-
-        //    var rand = new Random((int) DateTime.Now.Ticks);
-        //    for (int i = 0; i < 100; i++)
-        //    {
-        //        var registerUserView = new UserView()
-        //        {
-        //            ID = 0,
-        //            Email = Email.GetRandom(Name.GetRandom(), Surname.GetRandom()),
-        //            Password = "123456",
-        //            ConfirmPassword = "123456",
-        //            Captcha = "1111",
-        //            BirthdateDay = rand.Next(28) + 1,
-        //            BirthdateMonth = rand.Next(12) + 1,
-        //            BirthdateYear = 1970 + rand.Next(20)
-        //        };
-        //        controller.Register(registerUserView);
-        //    }
+            for (int i = 0; i < 100; i++)
+            {
+                var registerUserView = new UserRegisterView()
+                {
+                    Login = RandomString(6),
+                    Password = "123456",
+                    ConfirmPassword = "123456",
+                    Email = "vv@d.d", // Email.GetRandom(Name.GetRandom(), Surname.GetRandom()),
+                    Address = "",
+                    Captcha = "1111",
+                    SkipEmailConfirmation = true,
+                    //BirthdateDay = rand.Next(28) + 1,
+                    //BirthdateMonth = rand.Next(12) + 1,
+                    //BirthdateYear = 1970 + rand.Next(20)
+                };
+                controller.Register(registerUserView);
+            }
         }
     }
 }

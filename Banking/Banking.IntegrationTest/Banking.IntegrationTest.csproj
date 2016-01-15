@@ -57,8 +57,9 @@
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=3.0.5813.39031, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -116,13 +117,13 @@
       <Project>{9b46b9d6-6916-4a78-875f-90f42c1150d7}</Project>
       <Name>Banking.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Banking.Tests\Banking.UnitTests.csproj">
-      <Project>{135727ce-9e95-488d-b89b-dc170db84457}</Project>
-      <Name>Banking.UnitTests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Banking\Banking.WebUI.csproj">
       <Project>{22fea627-a5f9-480c-b7bb-7354238a4b5d}</Project>
       <Name>Banking.WebUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CommonTests\Banking.CommonTests.csproj">
+      <Project>{26316f61-4542-4295-9c84-e83db7849bf4}</Project>
+      <Name>Banking.CommonTests</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

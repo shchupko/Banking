@@ -7,13 +7,14 @@ using System.Globalization;
 using Moq;
 using Banking.Controllers;
 using System.Web.Mvc;
+using Banking.CommonTests;
 using Banking.Domain.Abstract;
 using Banking.Domain.Models.ViewModels;
-using Banking.Tests.Tools;
+using Banking.UnitTests.Tools;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
-namespace Banking.Tests
+namespace Banking.UnitTests
 {
     [TestFixture]
     public class UserControllerLoginTest

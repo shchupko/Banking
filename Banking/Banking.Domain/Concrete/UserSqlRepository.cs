@@ -11,9 +11,8 @@ namespace Banking.Domain.Concrete
     public class UserSqlRepository : IUserSqlRepository
     {
         public BankingDbDataContext Db;
-        INotifyMail mailProvider;
 
-        public UserSqlRepository(BankingDbDataContext db = null, INotifyMail mail = null)
+        public UserSqlRepository(BankingDbDataContext db = null)
         {
             if (db == null)
             {
@@ -23,8 +22,6 @@ namespace Banking.Domain.Concrete
             {
                 Db = db;
             }
-
-            mailProvider = mail;
         }
 
         public IEnumerable<User> Users

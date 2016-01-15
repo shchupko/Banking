@@ -7,7 +7,7 @@ using System.Reflection;
 using NUnit.Framework;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
 
-namespace Banking.Tests
+namespace Banking.UnitTests
 {
     [TestFixture]
     public class RouteTests
@@ -36,7 +36,7 @@ namespace Banking.Tests
         }
 
         private void TestRouteMatch(string url, string controller, string action,
-    object routeProperties = null, string httpMethod = "GET")
+            object routeProperties = null, string httpMethod = "GET")
         {
             // Организация
             RouteCollection routes = new RouteCollection();

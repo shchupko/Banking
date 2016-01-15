@@ -1,12 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.WebUI", "Banking\Banking.WebUI.csproj", "{22FEA627-A5F9-480C-B7BB-7354238A4B5D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.UnitTests", "Banking.Tests\Banking.UnitTests.csproj", "{135727CE-9E95-488D-B89B-DC170DB84457}"
 	ProjectSection(ProjectDependencies) = postProject
+		{26316F61-4542-4295-9C84-E83DB7849BF4} = {26316F61-4542-4295-9C84-E83DB7849BF4}
 		{9B46B9D6-6916-4A78-875F-90F42C1150D7} = {9B46B9D6-6916-4A78-875F-90F42C1150D7}
 	EndProjectSection
 EndProject
@@ -15,9 +16,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.IntegrationTest", "Banking.IntegrationTest\Banking.IntegrationTest.csproj", "{D727A7BF-CDB2-4CD1-9973-EA5381877B3A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{22FEA627-A5F9-480C-B7BB-7354238A4B5D} = {22FEA627-A5F9-480C-B7BB-7354238A4B5D}
-		{135727CE-9E95-488D-B89B-DC170DB84457} = {135727CE-9E95-488D-B89B-DC170DB84457}
+		{26316F61-4542-4295-9C84-E83DB7849BF4} = {26316F61-4542-4295-9C84-E83DB7849BF4}
 		{9B46B9D6-6916-4A78-875F-90F42C1150D7} = {9B46B9D6-6916-4A78-875F-90F42C1150D7}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.CommonTests", "CommonTests\Banking.CommonTests.csproj", "{26316F61-4542-4295-9C84-E83DB7849BF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +44,10 @@ Global
 		{D727A7BF-CDB2-4CD1-9973-EA5381877B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D727A7BF-CDB2-4CD1-9973-EA5381877B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D727A7BF-CDB2-4CD1-9973-EA5381877B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26316F61-4542-4295-9C84-E83DB7849BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26316F61-4542-4295-9C84-E83DB7849BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26316F61-4542-4295-9C84-E83DB7849BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26316F61-4542-4295-9C84-E83DB7849BF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

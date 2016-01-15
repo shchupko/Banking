@@ -11,13 +11,12 @@ using NUnit.Framework;
 using System.ComponentModel.DataAnnotations;
 using Banking.Domain;
 using Banking.Domain.Concrete;
-using Banking.Tests.Mock;
-using Banking.Tests.Mock.Http;
-using Banking.Tests.Setup;
-using Banking.Tests.Tools;
+using Banking.CommonTests;
+using Banking.UnitTests.Mock;
+using Banking.UnitTests.Tools;
 using Assert = NUnit.Framework.Assert;
 
-namespace Banking.Tests
+namespace Banking.UnitTests
 {
     [TestFixture]
     public class UserControllerRegisterTest
@@ -81,7 +80,7 @@ namespace Banking.Tests
             };
             try
             {
-                ValidatorTool.ValidateObject<UserRegisterView>(model);
+                Banking.CommonTests.ValidatorTool.ValidateObject<UserRegisterView>(model);
             }
             catch (Exception ex)
             {

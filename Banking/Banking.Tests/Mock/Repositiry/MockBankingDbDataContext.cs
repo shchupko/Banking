@@ -6,7 +6,7 @@ using Banking.Domain;
 using Banking.Domain.Abstract;
 using Moq;
 
-namespace Banking.Tests.Mock
+namespace Banking.UnitTests.Mock
 {
     public class MockDb
     {

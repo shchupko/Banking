@@ -25,7 +25,7 @@ namespace Banking.Controllers
                     FileText = stream.ReadToEnd();
                 }
             }
-            catch (Exception exc)
+            catch (Exception )
             {
                 FileText = "Can't open file " + filepath;
             } 
@@ -39,7 +39,7 @@ namespace Banking.Controllers
 
             throw new HttpException(403, "Throw Exception");
 
-            return View();
+            //return View();
         }
 
         public ViewResult Flex()

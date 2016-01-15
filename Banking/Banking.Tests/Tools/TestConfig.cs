@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Banking.Tests.Tools
+namespace Banking.UnitTests.Tools
 {
     class TestConfig 
     {
@@ -70,9 +70,5 @@ namespace Banking.Tests.Tools
         //{
         //    get { return (MailSetting) configuration.GetSection("mailConfig"); }
         //}
-
-
     }
-
-
 }

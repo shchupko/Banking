@@ -1,0 +1,9 @@
+D:\Prj\GitRepo\Banking\CommonTests\bin\Debug\CommonTests.dll
+D:\Prj\GitRepo\Banking\CommonTests\bin\Debug\CommonTests.pdb
+D:\Prj\GitRepo\Banking\CommonTests\bin\Debug\Moq.dll
+D:\Prj\GitRepo\Banking\CommonTests\bin\Debug\Moq.xml
+D:\Prj\GitRepo\Banking\CommonTests\obj\Debug\CommonTests.dll
+D:\Prj\GitRepo\Banking\CommonTests\obj\Debug\CommonTests.pdb
+D:\Prj\GitRepo\Banking\CommonTests\obj\Debug\Banking.CommonTests.csprojResolveAssemblyReference.cache
+D:\Prj\GitRepo\Banking\CommonTests\bin\Debug\System.Web.Mvc.dll
+D:\Prj\GitRepo\Banking\CommonTests\bin\Debug\System.Web.Mvc.xml

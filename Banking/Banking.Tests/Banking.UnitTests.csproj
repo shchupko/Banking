@@ -9,8 +9,8 @@
     <ProjectGuid>{135727CE-9E95-488D-B89B-DC170DB84457}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Banking.Tests</RootNamespace>
-    <AssemblyName>Banking.Tests</AssemblyName>
+    <RootNamespace>Banking.UnitTests</RootNamespace>
+    <AssemblyName>Banking.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -77,8 +77,9 @@
     <Reference Include="nunit.core.interfaces">
       <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.core.interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.3.0.1\lib\net45\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.util">
       <HintPath>..\packages\NUnitTestAdapter.2.0.0\lib\nunit.util.dll</HintPath>
@@ -149,20 +150,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mock\Http\MockHttpBrowserCapabilities.cs" />
-    <Compile Include="Mock\Http\MockHttpCachePolicy.cs" />
-    <Compile Include="Mock\Http\MockHttpContext.cs" />
-    <Compile Include="Mock\Http\MockHttpRequest.cs" />
-    <Compile Include="Mock\Http\MockHttpResponse.cs" />
-    <Compile Include="Mock\Http\MockHttpServerUtility.cs" />
-    <Compile Include="Mock\Http\MockHttpSessionState.cs" />
     <Compile Include="Mock\Mail\MockMailSender.cs" />
     <Compile Include="Mock\Repositiry\MockBankingDbDataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteTests.cs" />
     <Compile Include="UserControllerLoginTest.cs" />
     <Compile Include="Setup\UnitTestSetupFixture.cs" />
-    <Compile Include="Tools\Validator.cs" />
     <Compile Include="Tools\TestConfig.cs" />
     <Compile Include="UserControllerRegisterTest.cs" />
   </ItemGroup>
@@ -186,6 +179,10 @@
     <ProjectReference Include="..\Banking\Banking.WebUI.csproj">
       <Project>{22FEA627-A5F9-480C-B7BB-7354238A4B5D}</Project>
       <Name>Banking.WebUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CommonTests\Banking.CommonTests.csproj">
+      <Project>{26316f61-4542-4295-9c84-e83db7849bf4}</Project>
+      <Name>Banking.CommonTests</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

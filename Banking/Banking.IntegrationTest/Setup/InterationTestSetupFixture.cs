@@ -1,27 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Linq;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Autofac;
 using NUnit.Framework;
-using Banking.Tests.Mock;
-using Banking.Tests.Setup;
 using System.Configuration;
-using Autofac.Integration.Mvc;
-using Banking.Domain.Abstract;
-using Banking.Domain.Concrete;
-using Banking.Mappers;
+using Banking.Tools;
 
 namespace Banking.IntegrationTest.Setup
 {
-    [TestFixture]
+   // [TestFixture]
     public class IntegrationTestSetupFixture/* : UnitTestSetupFixture*/
     {
-        protected static string Sandbox = "../../Sandbox";
+        protected static string Sandbox = "D:\\Prj\\Sandbox";
 
         public class FileListRestore
         {
@@ -36,49 +26,45 @@ namespace Banking.IntegrationTest.Setup
         protected static string TestDbName;
 
 
-        [OneTimeSetUp]
+       // [OneTimeSetUp]
         public virtual void Setup()
         {
             Console.WriteLine("=====START=====");
 
-            ConfigureContainer();
-        }
-
-
-        protected void ConfigureContainer()
-        {
-            var builder = new ContainerBuilder();
-
-            builder.RegisterControllers(typeof(MvcApplication).Assembly);
-
-            InitRepository(builder);
-
-            builder.RegisterType<CommonMapper>().As<IMapper>().SingleInstance();
-            builder.RegisterType<FormAuthProvider>().As<IAuthProvider>();
-            //builder.RegisterType<MockRepositoryUser>().As<IUserSqlRepository>().InstancePerRequest();
-            //builder.RegisterType<ClientSqlRepository>().As<IClientSqlRepository>().InstancePerRequest();
-
-            // builder.RegisterInstance(HttpRequestScopedFactoryFor<IUserSqlRepository>()); 
-            builder.RegisterModule(new AutofacWebTypesModule());
-
-            // создаем новый контейнер с теми зависимостями, которые определены выше
-            var container = builder.Build();
-
-            // установка сопоставителя зависимостей
-            DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
-        }
-
-
-        protected void InitRepository(ContainerBuilder builder)
-        {
             FileInfo sandboxFile;
             string connectionString;
             CopyDb(out sandboxFile, out connectionString);
-
-            //builder.Register<BankingDbDataContext>(c => new MockBankingDbDataContext().Object).SingleInstance();
-
             sandboxFile.Delete();
+
+            AutofacConfig.ConfigureContainer();
         }
+
+
+        //protected void ConfigureContainer()
+        //{
+        //    var builder = new ContainerBuilder();
+
+        //    builder.RegisterControllers(typeof(MvcApplication).Assembly);
+
+        //    InitRepository(builder);
+
+        //    builder.RegisterType<CommonMapper>().As<IMapper>().SingleInstance();
+        //    builder.RegisterType<FormAuthProvider>().As<IAuthProvider>();
+        //    //builder.RegisterType<MockRepositoryUser>().As<IUserSqlRepository>().InstancePerRequest();
+        //    //builder.RegisterType<ClientSqlRepository>().As<IClientSqlRepository>().InstancePerRequest();
+
+        //    // builder.RegisterInstance(HttpRequestScopedFactoryFor<IUserSqlRepository>()); 
+        //    builder.RegisterModule(new AutofacWebTypesModule());
+
+        //    // создаем новый контейнер с теми зависимостями, которые определены выше
+        //    var container = builder.Build();
+
+        //    // установка сопоставителя зависимостей
+        //    DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+        //}
+
+
+
 
         private void CopyDb(out FileInfo sandboxFile, out string connectionString)
         {
@@ -111,7 +97,7 @@ namespace Banking.IntegrationTest.Setup
             connectionString = connectionstring.Replace(NameDb, TestDbName);
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void TearDown()
         {
             if (removeDbAfter)
