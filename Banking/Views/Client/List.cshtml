@@ -1,47 +1,55 @@
-﻿@using System.Web.UI.WebControls
+﻿@using System.IdentityModel.Claims
+@using System.Web.UI.WebControls
 @using Banking.Domain
-@model IEnumerable<Client>
+@model Banking.Controllers.PagedClientsModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <head>
-    
+    <title>List</title>
+    <script src="~/Scripts/jquery.rightClick.js" type="text/javascript"></script>
+    <link href="~/Content/contextmenu.css" rel="stylesheet" type="text/css" media="all">
+    <script src="~/Scripts/jquery.contextMenu.js" type="text/javascript"></script>
+    <link href="~/Scripts/jquery.contextmenu.css" rel="stylesheet" type="text/css" media="all">
+    <script src="~/Scripts/jquery.ui.position.js" type="text/javascript"></script>
 </head>
 
-
+@*example. add to context menu
+<a href="#" onclick="window.print(); return false;">Print</a> 
+<input type="button" onclick="window.print()"  value="Print This Page" />
+<a href="javascript:window.print()">Print This Page</a>*@
 
 <body>
-    <div>
-        @using (Ajax.BeginForm("PersonSearch", new AjaxOptions
-        {
-            UpdateTargetId = "results",
-            Confirm = "Выполнить AJAX-запрос?",
-            LoadingElementId = "loading",
-            LoadingElementDuration = 1000,
-            OnBegin = "OnBegin",
-            OnFailure = "OnFailure",
-            OnSuccess = "OnSuccess",
-            OnComplete = "OnComplete"
-        }))
-        {
+
+    @using (Ajax.BeginForm("ListQuery", new AjaxOptions
+    {
+        UpdateTargetId = "results",
+        Confirm = "Выполнить AJAX-запрос?",
+        LoadingElementId = "loading",
+        LoadingElementDuration = 1000,
+        OnBegin = "OnBegin",
+        OnFailure = "OnFailure",
+        OnSuccess = "OnSuccess",
+        OnComplete = "OnComplete",
+
+    }))
+    {
+        <div style="text-align:right;">
             <input type="text" name="name" />
-            <input type="submit" value="Поиск" />
-        }
-        @*<img id="loading" src="@Url.Content("~/Content/BankingLogo.png")" style="display:none" />*@
-        <div id="loading" style="display:none; color:Red; font-weight:bold;">
-                <p>Идет загрузка...</p>
-            </div>
-        <div id="results"></div>
-    </div>
+            <input type="submit" value="First name Search" />
+        </div>       
+    }
 
     @using (Html.BeginForm("List", "Client", FormMethod.Post))
     {
-
         <div id="grid">
-            @{
-        var grid = new WebGrid(Model, defaultSort: "ContactNumber", selectionFieldName: "SelectedRow", rowsPerPage: 6, ajaxUpdateContainerId: "grid");
+        @{
+        var grid = new WebGrid(rowsPerPage: Model.PageSize, ajaxUpdateContainerId: "grid");
+        grid.Bind(Model.Clients,
+        autoSortAndPage: false,
+        rowCount: Model.TotalRows);
 
         @grid.GetHtml(
         tableStyle: "webgrid-table",
@@ -51,165 +59,178 @@
         selectedRowStyle: "webgrid-selected-row",
         rowStyle: "webgrid-row-style",
         mode: WebGridPagerModes.All,
+        firstText: "<< First",
+        previousText: "< Prev",
+        nextText: "Next >",
+        lastText: "Last >>",
 
-        columns: grid.Columns
-        (
-        grid.Column(format: @<text>
-            <button name="action" value=@string.Format("Edit={0}", @item.ContactNumber)>Edit</button>
-            <button name="action" value=@string.Format("Delete={0}", @item.ContactNumber)
-                    onclick="javascript:return ConfirmDelete(@item.ContactNumber);">
-                Delete
-            </button>
-        </text>),
+        columns: grid.Columns(
+            grid.Column(columnName: "ContactNumber", header: "Client Contract Number",
+            @*format: @<text>@item.GetSelectLink(@item.ContactNumber.ToString("000000"))</text>),*@
+            format: @<text>@item.ContactNumber.ToString("000000")</text>),
+
+            grid.Column(columnName: "Firstname", header: "First name", canSort: true),
+            grid.Column(columnName: "Lastname", header: "Last name"),
+            grid.Column(columnName: "Birsday", header: "Birsday", format: a => (a.Birsday.ToString("D"))),
+            grid.Column(columnName: "Phone", header: "Phone number", format: @<text>@item.Phone</text>),
+            grid.Column(columnName: "Status", header: "Status"),
+            grid.Column(columnName: "Depo", header: "Deposit",
+                format: (item) => Html.CheckBox("depo", @item.depo == null ? false : item.depo ? true : false)),
+            grid.Column(format:
+            @<text>
+                <button name="action" value=@string.Format("Delete={0}", @item.ContactNumber)
+                        onclick="javascript:return ConfirmDelete(@item.ContactNumber);">
+                    Delete
+                </button>
+                <button name="action" value=@string.Format("Edit={0}", @item.ContactNumber)>Edit</button>
+                <button name="action" value=@string.Format("Print={0}", @item.ContactNumber)>Print</button>          
+            </text>)
         @*grid.Column(format: @<text>@Html.ActionLink(item.ContactNumber, "Delete", "DeleteAction", new { id = item.ContactNumber }, null)</text>),*@
 
- grid.Column(columnName: "ContactNumber", header: "Client Contract Number",
-@*format: @<text>@item.GetSelectLink(@item.ContactNumber.ToString("000000"))</text>),*@
- format: @<text>@item.ContactNumber.ToString("000000")</text>),
-
-            grid.Column(columnName: "firstname", header: "First name", canSort: true),
-            grid.Column(columnName: "lastname", header: "Last name"),
-            grid.Column(columnName: "birsday", header: "Birsday", format: a => (a.birsday.ToString("D"))),
-            grid.Column(columnName: "phone", header: "Phone number", format: @<text>@item.phone</text>),
-            grid.Column(columnName: "status", header: "Status"),
-            grid.Column(columnName: "depo", header: "Deposit",
-            format: (item) => Html.CheckBox("depo", @item.depo == null ? false : item.depo ? true : false))
-            @*format:   @<text>
-                    <input type="checkbox" @if (@item.depo != null && @item.depo == true) { <text> checked="checked" </text> } value="@item.depo" />
-                </text>)*@
-)
-                                                 )
-            }
-            @*@if (grid.HasSelection)
-                {
-                @Html.Action("Person", "Client", new { Client = grid.SelectedRow});
-                }*@
-        </div>
-
-        <div class="webgrid-footer">
-            <button name="action" value="New">Create New Client</button>
-
-            @if (ViewBag.TotalCount != null)
-            {
-                <button name="action" value="Vip">Show Only Vip</button>
-                @:Total count of clients: @ViewBag.TotalCount
+        ) // columns: grid.Columns(
+        ) //@grid.GetHtml(
         }
-            else
-            {
-                <button name="action" value="ShowAll">Show All</button>
-            }
-
-            Count of VIP clients: @ViewBag.VipCount
-            Clients who did Deposit: @ViewBag.DepoCount
         </div>
-    }
-
-<script type="text/javascript">
-    function OnBegin() {
-        alert("Происходит отправка запроса");
-    }
-
-    function OnSuccess(data) {
-        alert("Запрос был успешно выполнен. Получены следующие данные: \n" + data);
-    }
-
-    function OnFailure(request, error) {
-        $("#results").html("Книги указанного автора не содержатся в базе данных.");
-    }
-
-    function OnComplete(request, status) {
-        alert("Статус запроса : " + status);
-    }
 
 
-    function ConfirmDelete(id) {
-        return confirm("Are you sure you want to delete client " + id + " ?");
-    }
-
-    $("tr").click(function () {
-        $(".highlight").not(this).toggleClass("highlight");
-        $(this).toggleClass("highlight");
-        //var rowId = $(event.target).parent("tr").attr("ContactNumber");
-        //console.log(rowId);
-    });
-
-    $("tr").dblclick(function () {
-        console.log($(this).text());
-        var id = $(this).find("td:nth-child(2)").text();
-        $.post("?Edit=" + id);
-    });
-
-    $(document).ready(function () {
-        $("#grid tbody tr").each(function (i, row) {
-            var $actualRow = $(row);
-            if ($actualRow.find('input[type=checkbox]').prop('checked') == true) {
-                $actualRow.toggleClass("highlight");
+        <style>
+            table.footerText {
+                width: 100%; /* Ширина таблицы */
+                border-spacing: 0; /* Расстояние между ячейками */
+                text-align: left; /* Выравнивание по правому краю */
             }
-            var id = i % 2; //$actualRow.find("columnName='ContactNumber'").text();
-            var searchList = '@ViewBag.SearchList';
-            @*alert(@ViewBag.SearchResult);
-            if (searchList.contain(id)) {
-                $actualRow.toggleClass("highlight");
-            }*@
+
+            td.rightcol { /* Правая ячейка */
+                text-align: right; /* Выравнивание по правому краю */
+            }
+        </style>
+
+
+        <table class="footerText">
+            <tr>
+                <td>
+                    <button name="action" value="New">Create New Client</button>
+
+                    @if (ViewBag.OnlyVip == "true" || ViewBag.isFiltered == "true")
+                    {
+                        <button name="action" value="ShowAll">Show All</button>
+                    }
+                    else
+                    {
+                        <button name="action" value="Vip">Show Only Vip</button>
+                    }
+                </td>
+                <td class="rightcol">
+                    Total count of clients: @Model.TotalRows &nbsp;
+                    Count of VIP clients: @Model.VipCount &nbsp;
+                    Clients who did Deposit: @Model.DepoCount &nbsp;
+                </td>
+            </tr>
+        </table>
+    }
+
+    <script type="text/javascript">
+
+        //example just
+        $(document).ready(function () {
+            // Capture right click
+            $("tr").rightClick(function (e) {
+                console.log('rightClick', this);
+            });
+            // Capture right mouse down
+            $("tr").rightMouseDown(function (e) {
+                console.log('rightMouseDown', this);
+            });
+            // Capture right mouseup
+            $("tr").rightMouseUp(function (e) {
+                console.log('rightMouseUp', this);
+            });
+            // Disable context menu on an element
+            //$("#selector").noContext();
         });
-        var html = '<tfoot><tr><td colspan="3">&nbsp;</td><td>footer</td><td>&nbsp;</td>';
-        $('grid').append(html);
-    });
+
+        $(function () {
+            $.contextMenu({
+                selector: 'tr',
+                callback: function (key, options) {
+                    var id = $(this).find('td:first').text();
+                    $.post( "List", key + "=" + id);
+
+                    // tryed:    $.post("List", {name:"action", value:"Edit=" + id});
+                    // protopipe:  <button name="action" value=string.Format("Edit={0}", item.ContactNumber)>Edit</button>
+
+                    //// собираем данные с элементов страницы:
+                    //var $form = $(this),
+                    //  id = $(this).find('td:first').text(),
+                    //  url = $form.attr('action');
+                    //// отправляем данные методом POST 
+                    //var posting = $.post(url, { s: id });
+                    //// результат помещаем в div
+                    //posting.done(function (data) {
+                    //    var content = $(data).find('#content');
+                    //    $("#result").empty().append(content);
+                    //});
 
 
-    </script>
-    @*<script type="text/javascript">
-    function OnSuccess(data) {
-        var results = $('#results2'); // получаем нужный элемент
-        results.empty(); //очищаем элемент
-        for (var i = 0; i < data.length; i++) {
-            console.log(data[i].Name);
-            //results.append('<li>' + data[i].Name + '</li>'); // добавляем данные в список
-        }
-    }
-    </script>*@
-
-    @using (Ajax.BeginForm("JsonSearch", new AjaxOptions { OnSuccess = "OnSuccess" }))
-    {
-        <input type="text" name="name" />
-        <input type="submit" value="Поиск" />
-    }
-    <br />
-<div id="results2"></div>
-
-    @*$(document).ready(function () {
-                try {
-                    $(document).bind("contextmenu", function (e) {
-                        e.preventDefault();
-                        $("#custom-menu").css({ top: e.pageY + "px", left: e.pageX + "px" }).show(100);
-                    });
-                    $(document).mouseup(function (e) {
-                        var container = $("#custom-menu");
-                        if (container.has(e.target).length == 0) {
-                            container.hide();
+                    var m = "clicked: " + key + id;
+                    window.console && console.log(m);// || alert(m);
+                },
+                items: {
+                    "Edit": { name: "Edit" },
+                    //copy: { name: "Copy", icon: "copy" },
+                    //"print": { name: "Print", icon: "print" },
+                    "Delete": { name: "Delete" },
+                    "sep1": "---------",
+                    "New": { name: "Create New Client" },
+                    "Vip": { name: "Show Only Vip"},
+                    "sep2": "---------",
+                    "quit": { name: "Quit", icon: function () {
+                            return 'context-menu-icon context-menu-icon-quit';
                         }
-                    });
-                }
-                catch (err) {
-                    alert(err);
+                    }
                 }
             });
-        </script>
 
-            <div id="custom-menu" style="width:250px;display:none">
-                <ul style="width: 250px">
-                    <li id="add">
-                        <span class="ui-icon ui-icon-plus" style="float:left"></span>
-                        <span style="font-family:Tahoma">Add Row</span>
-                    </li>
-                    <li id="edit">
-                        <span class="ui-icon ui-icon-pencil" style="float:left"></span>
-                        <span style="font-family:Tahoma">Edit Row</span>
-                    </li>
-                    <li id="del">
-                        <span class="ui-icon ui-icon-trash" style="float:left"></span>
-                        <span style="font-family:Tahoma">Delete Row</span>
-                    </li>
-                </ul>
-            </div>*@
+            $('#grid').on('click', function (e) {
+                console.log('clicked', this);
+            })
+        });
+
+
+        $("tr").click(function () {
+            $(this).qtip({
+                content: {
+                    text: 'You can use right click',
+                    title: 'Tip'
+                }
+            });
+        });
+
+        function ConfirmDelete(id) {
+            return confirm("Are you sure you want to delete client " + id + " ?");
+        }
+
+        $("tr").click(function () {
+            $(".highlight").not(this).toggleClass("highlight");
+            $(this).toggleClass("highlight");
+            //var rowId = $(event.target).parent("tr").attr("ContactNumber");
+            //console.log(rowId);
+        });
+
+        $("tr").dblclick(function () {
+            console.log($(this).text());
+            var id = $(this).find("td:nth-child(1)").text();
+            $.post("?Edit=" + id);
+        });
+
+        //// Add footer ???
+        //$(document).ready(function () {
+        //    var html = $('.webgrid-footer');
+        //    $('#grid').append(html);
+        //});
+
+    </script>
+
+
+
 </body>

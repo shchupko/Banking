@@ -1,2 +1,2 @@
 # BankingRepo
-mvc test task
+mvc task
